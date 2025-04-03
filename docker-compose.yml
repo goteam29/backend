@@ -1,0 +1,80 @@
+version: '3.5'
+
+services:
+  redis:
+    container_name: redis_container
+    image: redis
+    volumes:
+      - ./storage/redis:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - main-api-network
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  postgres:
+    container_name: postgres_container
+    image: postgres
+    volumes:
+      - ./storage/postgres:/data
+    ports:
+      - "5432:5432"
+    networks:
+      main-api-network:
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U root -d postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+
+  minio-default:
+    container_name: minio-default_container
+    image: minio
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./storage/minio-default:/data
+    networks:
+      - main-api-network
+
+  minio-video:
+    container_name: minio-video_container
+    image: minio
+    ports:
+      - "9001:9001"
+    volumes:
+      - ./storage/minio-video:/data
+    networks:
+      - video-api-network
+
+  main-api-service:
+    container_name: main-api_container
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    ports:
+      - "50051:50051"
+      - "8081:8081"
+
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    networks:
+      main-api-network:
+
+
+
+networks:
+  main-api-network:
+    driver: bridge
+
+volumes:
+  postgres:
+  redis:
