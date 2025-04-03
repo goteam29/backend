@@ -1,5 +1,3 @@
-version: '3.5'
-
 services:
   redis:
     container_name: redis_container
@@ -11,19 +9,24 @@ services:
     networks:
       - main-api-network
     healthcheck:
-      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+      test: [ "CMD", "redis-cli", "ping" ]
       interval: 5s
       timeout: 5s
       retries: 5
+
   postgres:
     container_name: postgres_container
     image: postgres
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: postgres
     volumes:
-      - ./storage/postgres:/data
+      - ./storage/postgres:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     networks:
-      main-api-network:
+      - main-api-network
     restart: unless-stopped
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U root -d postgres" ]
@@ -31,12 +34,13 @@ services:
       timeout: 5s
       retries: 5
 
-
   minio-default:
     container_name: minio-default_container
-    image: minio
+    image: quay.io/minio/minio
+    command: server /data
     ports:
       - "9000:9000"
+      - "9001:9001"
     volumes:
       - ./storage/minio-default:/data
     networks:
@@ -44,9 +48,11 @@ services:
 
   minio-video:
     container_name: minio-video_container
-    image: minio
+    image: quay.io/minio/minio
+    command: server --address ":9002" --console-address ":9003" /data
     ports:
-      - "9001:9001"
+      - "9002:9002"
+      - "9003:9003"
     volumes:
       - ./storage/minio-video:/data
     networks:
@@ -60,21 +66,24 @@ services:
     ports:
       - "50051:50051"
       - "8081:8081"
-
     depends_on:
       redis:
         condition: service_healthy
       postgres:
         condition: service_healthy
+      minio-default:
+        condition: service_healthy
     networks:
-      main-api-network:
-
-
+      - main-api-network
 
 networks:
   main-api-network:
+    driver: bridge
+  video-api-network:
     driver: bridge
 
 volumes:
   postgres:
   redis:
+  minio-default:
+  minio-video:
