@@ -15,4 +15,3 @@ type User struct {
 	CreatedAt time.Time
 	DeletedAt time.Time
 	IsBlocked bool
-}
