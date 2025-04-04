@@ -1,7 +1,8 @@
 package main
 
 import (
-	user_service "api-repository/pkg/api/user-service"
+	mainConfig "api-repository/internal/config"
+	userservice "api-repository/pkg/api/user-service"
 	"context"
 	"fmt"
 	"log"
@@ -15,27 +16,33 @@ import (
 )
 
 type UserService struct {
-	user_service.UnimplementedUserServer
+	userservice.UnimplementedUserServer
 }
 
 func New() *UserService {
 	return &UserService{}
 }
 
-func (u *UserService) Get(ctx context.Context, req *user_service.Request) (*user_service.Reply, error) {
+func (u *UserService) Get(ctx context.Context, req *userservice.Request) (*userservice.Reply, error) {
 	if req.Message == "" {
 		return nil, status.Errorf(codes.InvalidArgument, "request cannot be empty")
 	}
 
-	return &user_service.Reply{Message: req.Message}, nil
+	return &userservice.Reply{Message: req.Message}, nil
 }
 
-const port = "8080"
+const port = "50050"
 
 func main() {
 	ctx := context.Background()
 	ctx, stop := signal.NotifyContext(ctx, os.Interrupt)
 	defer stop()
+
+	config, err := mainConfig.NewMainConfig()
+	if err != nil {
+		log.Fatalf("can't read config %v", err)
+	}
+	log.Println("Config:", config)
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
 	if err != nil {
@@ -44,7 +51,7 @@ func main() {
 
 	server := grpc.NewServer()
 	service := New()
-	user_service.RegisterUserServer(server, service)
+	userservice.RegisterUserServer(server, service)
 
 	log.Printf("server listening at %v", lis.Addr())
 	go func() {

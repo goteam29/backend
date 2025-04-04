@@ -9,7 +9,3 @@ type Config struct {
 	SecretKey  string
 	UseSSL     bool
 }
-
-func NewConfig() *Config {
-
-}
