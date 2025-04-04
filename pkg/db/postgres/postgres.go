@@ -24,7 +24,7 @@ func NewPostgres(c PgConfig) (*sql.DB, error) {
 		c.Database,
 	)
 
-	conn, err := sql.Open("postgresql", connStr)
+	conn, err := sql.Open("postgres", connStr)
 	if err != nil {
 		log.Fatalf("can't connect to database | err:  %v", err)
 	}
