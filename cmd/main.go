@@ -5,13 +5,14 @@ import (
 	userservice "api-repository/pkg/api/user-service"
 	"api-repository/pkg/db/postgres"
 	"api-repository/pkg/db/redis"
+	logger "api-repository/pkg/utils"
 	"context"
 	"fmt"
-	"log"
 	"net"
 	"os"
 	"os/signal"
 
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -40,37 +41,44 @@ func main() {
 	ctx, stop := signal.NotifyContext(ctx, os.Interrupt)
 	defer stop()
 
+	ctx, err := logger.New(ctx)
+	if err != nil {
+		logger.GetLoggerFromContext(ctx).Fatal(ctx, "can't initialize logger", zap.Error(err))
+	}
+	defer logger.GetLoggerFromContext(ctx).Sync()
+
 	config, err := mainConfig.NewMainConfig()
 	if err != nil {
-		log.Fatalf("can't read config %v", err)
+		logger.GetLoggerFromContext(ctx).Fatal(ctx, "can't read config", zap.Error(err))
 	}
-	log.Println("Config:", config)
+	logger.GetLoggerFromContext(ctx).Info(ctx, "config", zap.Any("config", config))
 
 	pgConn, err := postgres.NewPostgres(config.PgConf)
 	if err != nil {
-		log.Fatalf("can't connect to db %v", err)
+		logger.GetLoggerFromContext(ctx).Fatal(ctx, "can't connect to db", zap.Error(err))
 	}
-	log.Printf("Postgres %v", pgConn)
+	logger.GetLoggerFromContext(ctx).Info(ctx, "postgres", zap.Any("postgres", pgConn))
 
 	redisConn := redis.NewRedisConn(config.RedisConf)
-	log.Printf("Redis %v", redisConn)
+	logger.GetLoggerFromContext(ctx).Info(ctx, "redis", zap.Any("redis", redisConn))
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		logger.GetLoggerFromContext(ctx).Fatal(ctx, "failed to listen", zap.Error(err))
 	}
 
 	server := grpc.NewServer()
 	service := New()
 	userservice.RegisterUserServer(server, service)
 
-	log.Printf("server listening at %v", lis.Addr())
+	logger.GetLoggerFromContext(ctx).Info(ctx, "server started", zap.String("port", port))
 	go func() {
 		if err := server.Serve(lis); err != nil {
-			log.Fatalf("failed to serve: %v", err)
+			logger.GetLoggerFromContext(ctx).Fatal(ctx, "failed to serve", zap.Error(err))
 		}
 	}()
 
 	<-ctx.Done()
 	server.GracefulStop()
+	logger.GetLoggerFromContext(ctx).Info(ctx, "server stopped")
 }
