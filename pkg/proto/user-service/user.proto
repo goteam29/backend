@@ -1,0 +1,43 @@
+syntax="proto3";
+
+option go_package="pkg/api/user-service";
+
+package user_service;
+
+service User{
+    rpc Get(Request) returns (Reply);
+    rpc Register(RegisterRequest) returns (RegisterResponse);
+    rpc Login(LoginRequest) returns (LoginResponse);
+
+}
+
+
+//register messages
+message RegisterRequest{
+    string email = 1;
+    string password = 2;
+    string passwordConfirm = 3;
+}
+
+message RegisterResponse{
+    string message = 1; //use it for notifying user of successful creating account (EXAMPLE: message = "account registered successfully!")
+}
+
+//login messages
+message LoginRequest{
+    string email = 1;
+    string password = 2;
+}
+
+message LoginResponse{
+    string message = 1; //use like in RegisterResponse
+}
+
+//other messages
+message Request{
+    string message = 1;
+}
+
+message Reply{
+    string message = 1;
+}

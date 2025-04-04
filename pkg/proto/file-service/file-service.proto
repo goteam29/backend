@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package fileservice;
+
+option go_package = "pkg/api/file-service";
+
+
+service File{
+  rpc GetFile(GetFileRequest) returns (GetFileResponse);
+}
+
+//Get file messages
+message GetFileRequest{
+  string filename = 1;
+}
+
+message GetFileResponse{
+  bytes content = 1;
+}
