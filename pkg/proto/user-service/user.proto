@@ -14,13 +14,15 @@ service User{
 
 //register messages
 message RegisterRequest{
-    string email = 1;
-    string password = 2;
-    string passwordConfirm = 3;
+    string username = 1;
+    string email = 2;
+    string password = 3;
+    string passwordConfirm = 4;
 }
 
 message RegisterResponse{
-    string message = 1; //use it for notifying user of successful creating account (EXAMPLE: message = "account registered successfully!")
+    string uuid = 1; //use it for notifying user of successful creating account (EXAMPLE: message = "account registered successfully!")
+    bool isAdmin = 2;
 }
 
 //login messages
@@ -30,7 +32,7 @@ message LoginRequest{
 }
 
 message LoginResponse{
-    string message = 1; //use like in RegisterResponse
+    string uuid = 1; //use like in RegisterResponse
 }
 
 //other messages

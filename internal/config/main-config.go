@@ -1,14 +1,16 @@
 package config
 
 import (
-	fileConfig "api-repository/internal/file-service/service/config"
-	userConfig "api-repository/internal/user-sevice/service/config"
+	"api-repository/pkg/db/postgres"
+	"api-repository/pkg/db/redis"
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
 type MainConfig struct {
-	FileServiceConfig *fileConfig.Config
-	UserServiceConfig *userConfig.Config
+	GatewayPort     int `yaml:"GATEWAY_PORT" env:"GATEWAY_PORT" env-default:"8080"`
+	UserServicePort int `yaml:"USER_SERVICE_PORT" env:"USER_SERVICE_PORT" env-default:"50050"`
+	PgConf          postgres.PgConfig
+	RedisConf       redis.RConfig
 }
 
 func NewMainConfig() (*MainConfig, error) {
