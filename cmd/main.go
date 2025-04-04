@@ -8,14 +8,13 @@ import (
 	logger "api-repository/pkg/utils"
 	"context"
 	"fmt"
-	"net"
-	"os"
-	"os/signal"
-
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"net"
+	"os"
+	"os/signal"
 )
 
 type UserService struct {

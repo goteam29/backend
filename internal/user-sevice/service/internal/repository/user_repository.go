@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"api-repository/internal/user-sevice/models"
+	"api-repository/internal/user-sevice/service/internal/models"
 	"context"
 	"database/sql"
 )
