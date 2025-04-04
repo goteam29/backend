@@ -3,6 +3,8 @@ package main
 import (
 	mainConfig "api-repository/internal/config"
 	userservice "api-repository/pkg/api/user-service"
+	"api-repository/pkg/db/postgres"
+	"api-repository/pkg/db/redis"
 	"context"
 	"fmt"
 	"log"
@@ -43,6 +45,15 @@ func main() {
 		log.Fatalf("can't read config %v", err)
 	}
 	log.Println("Config:", config)
+
+	pgConn, err := postgres.NewPostgres(config.PgConf)
+	if err != nil {
+		log.Fatalf("can't connect to db %v", err)
+	}
+	log.Printf("Postgres %v", pgConn)
+
+	redisConn := redis.NewRedisConn(config.RedisConf)
+	log.Printf("Redis %v", redisConn)
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
 	if err != nil {

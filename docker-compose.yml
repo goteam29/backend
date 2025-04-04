@@ -45,6 +45,11 @@ services:
       - ./storage/minio-default:/data
     networks:
       - main-api-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
+      interval: 30s
+      timeout: 20s
+      retries: 3
 
   minio-video:
     container_name: minio-video_container
@@ -57,6 +62,11 @@ services:
       - ./storage/minio-video:/data
     networks:
       - video-api-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9002/minio/health/live" ]
+      interval: 30s
+      timeout: 20s
+      retries: 3
 
   main-api-service:
     container_name: main-api_container
@@ -87,3 +97,4 @@ volumes:
   redis:
   minio-default:
   minio-video:
+
