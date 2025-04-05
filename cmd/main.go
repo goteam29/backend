@@ -41,15 +41,16 @@ func main() {
 	if err != nil {
 		logger.GetLoggerFromContext(ctx).Fatal(ctx, "can't read config", zap.Error(err))
 	}
-	logger.GetLoggerFromContext(ctx).Info(ctx, "config", zap.Any("config", config))
 
-	pgConn, err := postgres.NewPostgres(config.PgConf)
+	logger.GetLoggerFromContext(ctx).Info(ctx, "main-config: ", zap.Any("config", config))
+
+	pgConn, err := postgres.NewPostgres(config.POSTGRES)
 	if err != nil {
 		logger.GetLoggerFromContext(ctx).Fatal(ctx, "can't connect to db", zap.Error(err))
 	}
 	logger.GetLoggerFromContext(ctx).Info(ctx, "postgres", zap.Any("postgres", pgConn))
 
-	redisConn := redis.NewRedisConn(config.RedisConf)
+	redisConn := redis.NewRedisConn(config.REDIS)
 	logger.GetLoggerFromContext(ctx).Info(ctx, "redis", zap.Any("redis", redisConn))
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", config.UserServicePort))

@@ -38,7 +38,15 @@ func (a *AuthHandler) Register(req *userservice.RegisterRequest) (*userservice.R
 	}
 	id := uuid.New()
 
-	a.db.Exec("INSERT ($1, $2, $3) IF NOT EXISTS ")
+	_, err = a.db.Exec("INSERT INTO users VALUES($1, $2, $3, $4) ON CONFLICT (email) DO NOTHING ",
+		id,
+		req.Username,
+		req.Email,
+		token,
+	)
+	if err != nil {
+		return nil, err
+	}
 
 	return &userservice.RegisterResponse{
 		Uuid:    id.String(),

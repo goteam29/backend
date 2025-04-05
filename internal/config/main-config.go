@@ -7,16 +7,16 @@ import (
 )
 
 type MainConfig struct {
-	GatewayPort     int `yaml:"GATEWAY_PORT" env:"GATEWAY_PORT" env-default:"8080"`
-	UserServicePort int `yaml:"USER_SERVICE_PORT" env:"USER_SERVICE_PORT" env-default:"50050"`
-	PgConf          postgres.PgConfig
-	RedisConf       redis.RConfig
+	GatewayPort     int               `yaml:"GATEWAY_PORT" env:"GATEWAY_PORT" env-default:"8080"`
+	UserServicePort int               `yaml:"USER_SERVICE_PORT" env:"USER_SERVICE_PORT" env-default:"50051"`
+	POSTGRES        postgres.PgConfig `yaml:"POSTGRES"`
+	REDIS           redis.RConfig     `yaml:"REDIS"`
 }
 
 func NewMainConfig() (*MainConfig, error) {
 	var cfg MainConfig
 
-	if err := cleanenv.ReadConfig("./config/config.yml", &cfg); err != nil {
+	if err := cleanenv.ReadConfig("config/config.yml", &cfg); err != nil {
 		return nil, err
 	}
 	return &cfg, nil
