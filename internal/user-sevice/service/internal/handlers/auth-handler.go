@@ -3,34 +3,51 @@ package handlers
 import (
 	userservice "api-repository/pkg/api/user-service"
 	"database/sql"
-	"sync"
+	"errors"
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
+	"time"
 )
 
-var once sync.Once
-
 type AuthHandler struct {
-	db *sql.DB
+	db     *sql.DB
+	secret string
 }
 
-func NewAuthHandler(_db *sql.DB) *AuthHandler {
-	var handler *AuthHandler
-	once.Do(func() {
-		handler = &AuthHandler{
-			db: _db,
-		}
-	})
-	return handler
-}
-
-func (a *AuthHandler) Register(req *userservice.RegisterRequest) *userservice.RegisterResponse {
-	return &userservice.RegisterResponse{
-		Uuid:    "1234",
-		IsAdmin: false,
+func NewAuthHandler(_db *sql.DB, _secret string) *AuthHandler {
+	return &AuthHandler{
+		db:     _db,
+		secret: _secret,
 	}
 }
 
-func (a *AuthHandler) Login(req *userservice.LoginRequest) *userservice.LoginResponse {
+func (a *AuthHandler) Register(req *userservice.RegisterRequest) (*userservice.RegisterResponse, error) {
+	if req.Password != req.PasswordConfirm {
+		return nil, errors.New("passwords don't match")
+	}
+
+	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"name": req.Username,
+		"exp":  time.Now().Add(time.Hour * 24 * 7).Unix(),
+		"iat":  time.Now().Unix(),
+	})
+
+	token, err := claims.SignedString([]byte(a.secret))
+	if err != nil {
+		return nil, err
+	}
+	id := uuid.New()
+
+	a.db.Exec("INSERT ($1, $2, $3) IF NOT EXISTS ")
+
+	return &userservice.RegisterResponse{
+		Uuid:    id.String(),
+		IsAdmin: false,
+	}, nil
+}
+
+func (a *AuthHandler) Login(req *userservice.LoginRequest) (*userservice.LoginResponse, error) {
 	return &userservice.LoginResponse{
 		Uuid: "1234",
-	}
+	}, nil
 }
