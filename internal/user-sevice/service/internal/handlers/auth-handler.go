@@ -26,17 +26,18 @@ func (a *AuthHandler) Register(req *userservice.RegisterRequest) (*userservice.R
 		return nil, errors.New("passwords don't match")
 	}
 
+	id := uuid.New()
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"name": req.Username,
-		"exp":  time.Now().Add(time.Hour * 24 * 7).Unix(),
-		"iat":  time.Now().Unix(),
+		"name":   req.Username,
+		"userid": id,
+		"exp":    time.Now().Add(time.Hour * 24 * 7).Unix(),
+		"iat":    time.Now().Unix(),
 	})
 
 	token, err := claims.SignedString([]byte(a.secret))
 	if err != nil {
 		return nil, err
 	}
-	id := uuid.New()
 
 	_, err = a.db.Exec("INSERT INTO users VALUES($1, $2, $3, $4) ON CONFLICT (email) DO NOTHING ",
 		id,
