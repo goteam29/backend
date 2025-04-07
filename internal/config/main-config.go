@@ -1,8 +1,10 @@
 package config
 
 import (
+	"api-repository/pkg/db/minio"
 	"api-repository/pkg/db/postgres"
 	"api-repository/pkg/db/redis"
+
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
@@ -11,6 +13,7 @@ type MainConfig struct {
 	UserServicePort int               `yaml:"USER_SERVICE_PORT" env:"USER_SERVICE_PORT" env-default:"50051"`
 	POSTGRES        postgres.PgConfig `yaml:"POSTGRES"`
 	REDIS           redis.RConfig     `yaml:"REDIS"`
+	MinIO           minio.MnConfig    `yaml:"MINIO"`
 }
 
 func NewMainConfig() (*MainConfig, error) {
