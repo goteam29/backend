@@ -45,6 +45,7 @@ func (a *AuthHandler) Register(req *userservice.RegisterRequest) (*userservice.R
 		req.Email,
 		token,
 	)
+
 	if err != nil {
 		return nil, err
 	}

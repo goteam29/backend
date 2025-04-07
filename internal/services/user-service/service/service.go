@@ -1,7 +1,7 @@
 package service
 
 import (
-	"api-repository/internal/user-sevice/service/internal/handlers"
+	"api-repository/internal/services/user-service/service/internal/handlers"
 	userservice "api-repository/pkg/api/user-service"
 	"context"
 	"database/sql"

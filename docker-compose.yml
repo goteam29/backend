@@ -68,23 +68,33 @@ services:
       timeout: 20s
       retries: 3
 
-  main-api-service:
-    container_name: main-api_container
+  user-service:
+    container_name: user-service_container
     build:
       context: .
-      dockerfile: ./docker/Dockerfile
+      dockerfile: internal/services/user-service/Dockerfile
     ports:
       - "50051:50051"
-      - "8081:8081"
     depends_on:
       redis:
         condition: service_healthy
       postgres:
         condition: service_healthy
+    networks:
+      - main-api-network
+  file-service:
+    container_name: file-service_container
+    build:
+      context: .
+      dockerfile: internal/services/file-service/Dockerfile
+    ports:
+      - "50052:50052"
+    depends_on:
       minio-default:
         condition: service_healthy
     networks:
       - main-api-network
+
 
 networks:
   main-api-network:

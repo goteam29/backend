@@ -4,7 +4,6 @@ import (
 	"api-repository/pkg/db/minio"
 	"api-repository/pkg/db/postgres"
 	"api-repository/pkg/db/redis"
-
 	"github.com/ilyakaznacheev/cleanenv"
 )
 

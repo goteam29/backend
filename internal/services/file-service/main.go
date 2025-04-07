@@ -2,7 +2,7 @@ package main
 
 import (
 	"api-repository/internal/config"
-	"api-repository/internal/file-service/service"
+	"api-repository/internal/services/file-service/service"
 	"log"
 )
 

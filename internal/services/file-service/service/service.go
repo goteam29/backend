@@ -2,6 +2,7 @@ package service
 
 import (
 	"api-repository/internal/config"
+	"api-repository/internal/services/file-service/service/internal/handlers"
 	"api-repository/pkg/db/minio"
 	"context"
 	"net"
@@ -19,19 +20,12 @@ type FileService struct {
 
 type fileServer struct {
 	pb.UnimplementedFileServer
+	fileHandler *handlers.FileHandler
 	minioClient *minio.Client
 }
 
 func (s *fileServer) GetFile(ctx context.Context, req *pb.GetFileRequest) (*pb.GetFileResponse, error) {
-	data, err := s.minioClient.GetFile(ctx, req.BucketName, req.ObjectKey)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pb.GetFileResponse{
-		Content:  data,
-		Filename: req.ObjectKey,
-	}, nil
+	return s.fileHandler.GetFile(ctx, req)
 }
 
 func New(cfg *config.MainConfig) (*FileService, error) {
@@ -43,6 +37,7 @@ func New(cfg *config.MainConfig) (*FileService, error) {
 	grpcServer := grpc.NewServer()
 	pb.RegisterFileServer(grpcServer, &fileServer{
 		minioClient: minioClient,
+		fileHandler: handlers.NewFileHandler(minioClient),
 	})
 
 	return &FileService{
