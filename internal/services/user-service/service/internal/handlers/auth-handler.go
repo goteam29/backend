@@ -10,7 +10,8 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
-	"time"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 )
 
 type AuthHandler struct {
