@@ -4,9 +4,11 @@ import (
 	userservice "api-repository/pkg/api/user-service"
 	"database/sql"
 	"errors"
+	"fmt"
+	"time"
+
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
-	"time"
 )
 
 type AuthHandler struct {
@@ -39,15 +41,25 @@ func (a *AuthHandler) Register(req *userservice.RegisterRequest) (*userservice.R
 		return nil, err
 	}
 
-	_, err = a.db.Exec("INSERT INTO users VALUES($1, $2, $3, $4) ON CONFLICT (email) DO NOTHING ",
-		id,
-		req.Username,
-		req.Email,
-		token,
-	)
+	userRow := a.db.QueryRow("SELECT id FROM users WHERE email = $1", req.Email)
 
+	err = userRow.Scan(&id)
 	if err != nil {
-		return nil, err
+		if err == sql.ErrNoRows {
+			_, err = a.db.Exec("INSERT INTO users VALUES($1, $2, $3, $4)",
+				id,
+				req.Username,
+				req.Email,
+				token,
+			)
+			if err != nil {
+				return nil, fmt.Errorf("failed to insert user: %w", err)
+			}
+		} else {
+			return nil, fmt.Errorf("failed to query user: %w", err)
+		}
+	} else {
+		return nil, errors.New("user already exists")
 	}
 
 	return &userservice.RegisterResponse{
