@@ -3,8 +3,12 @@ package postgres
 import (
 	"database/sql"
 	"fmt"
-	_ "github.com/lib/pq"
 	"log"
+
+	"github.com/golang-migrate/migrate"
+	_ "github.com/golang-migrate/migrate/database/postgres"
+	_ "github.com/golang-migrate/migrate/source/file"
+	_ "github.com/lib/pq"
 )
 
 type PgConfig struct {
@@ -30,6 +34,22 @@ func NewPostgres(c PgConfig) (*sql.DB, error) {
 	conn, err := sql.Open("postgres", connStr)
 	if err != nil {
 		log.Fatalf("can't connect to database | err:  %v", err)
+	}
+
+	m, err := migrate.New(
+		"file://db/migrations",
+		connStr,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("can't create migration | err: %v", err)
+	}
+
+	if err := m.Up(); err != nil {
+		if err == migrate.ErrNoChange {
+			log.Println("no new migrations")
+		} else {
+			return nil, fmt.Errorf("can't migrate database | err: %v", err)
+		}
 	}
 
 	return conn, nil
