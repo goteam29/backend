@@ -1,13 +1,27 @@
 syntax="proto3";
 
+import "google/api/annotations.proto";
 option go_package="pkg/api/user-service";
+
 
 package user_service;
 
 service User{
-    rpc Get(Request) returns (Reply);
-    rpc Register(RegisterRequest) returns (RegisterResponse);
-    rpc Login(LoginRequest) returns (LoginResponse);
+    rpc Get(Request) returns (Reply){
+        option (google.api.http) = {
+            get: "/v1/ping"
+        };
+    };
+    rpc Register(RegisterRequest) returns (RegisterResponse){
+        option (google.api.http) = {
+            post: "/v1/register"
+        };
+    };
+    rpc Login(LoginRequest) returns (LoginResponse){
+        option (google.api.http) = {
+            get: "/v1/login"
+        };
+    };
 
 }
 

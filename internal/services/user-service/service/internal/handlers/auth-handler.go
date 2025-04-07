@@ -2,6 +2,7 @@ package handlers
 
 import (
 	userservice "api-repository/pkg/api/user-service"
+	"context"
 	"database/sql"
 	"errors"
 	"fmt"
@@ -9,6 +10,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
+	"time"
 )
 
 type AuthHandler struct {
@@ -23,7 +25,7 @@ func NewAuthHandler(_db *sql.DB, _secret string) *AuthHandler {
 	}
 }
 
-func (a *AuthHandler) Register(req *userservice.RegisterRequest) (*userservice.RegisterResponse, error) {
+func (a *AuthHandler) Register(ctx context.Context, req *userservice.RegisterRequest) (*userservice.RegisterResponse, error) {
 	if req.Password != req.PasswordConfirm {
 		return nil, errors.New("passwords don't match")
 	}
@@ -62,13 +64,20 @@ func (a *AuthHandler) Register(req *userservice.RegisterRequest) (*userservice.R
 		return nil, errors.New("user already exists")
 	}
 
+	err = grpc.SendHeader(ctx, metadata.Pairs(
+		"Set-Cookie", "access_token="+token+"; HttpOnly; Path=/; SameSite=Lax",
+	))
+	if err != nil {
+		return nil, err
+	}
+
 	return &userservice.RegisterResponse{
 		Uuid:    id.String(),
 		IsAdmin: false,
 	}, nil
 }
 
-func (a *AuthHandler) Login(req *userservice.LoginRequest) (*userservice.LoginResponse, error) {
+func (a *AuthHandler) Login(ctx context.Context, req *userservice.LoginRequest) (*userservice.LoginResponse, error) {
 	return &userservice.LoginResponse{
 		Uuid: "1234",
 	}, nil

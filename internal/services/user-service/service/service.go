@@ -31,9 +31,9 @@ func NewUserService(pc *sql.DB) *UserService {
 }
 
 func (us *UserService) Register(ctx context.Context, request *userservice.RegisterRequest) (*userservice.RegisterResponse, error) {
-	return us.authHandler.Register(request)
+	return us.authHandler.Register(ctx, request)
 }
 
 func (us *UserService) Login(ctx context.Context, request *userservice.LoginRequest) (*userservice.LoginResponse, error) {
-	return us.authHandler.Login(request)
+	return us.authHandler.Login(ctx, request)
 }
