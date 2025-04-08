@@ -1,8 +1,6 @@
 package models
 
 import (
-	"time"
-
 	"github.com/google/uuid"
 )
 
@@ -12,7 +10,4 @@ type User struct {
 	Email     string
 	Password  string
 	IsAdmin   bool
-	CreatedAt time.Time
-	DeletedAt time.Time
-	IsBlocked bool
 }
