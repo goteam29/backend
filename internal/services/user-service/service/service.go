@@ -5,8 +5,11 @@ import (
 	userservice "api-repository/pkg/api/user-service"
 	"context"
 	"database/sql"
+	"log"
 	"os"
 	"sync"
+
+	"github.com/joho/godotenv"
 )
 
 var once sync.Once
@@ -18,7 +21,15 @@ type UserService struct {
 }
 
 func NewUserService(pc *sql.DB) *UserService {
-	secret := os.Getenv("JWT_SECRET_TOKEN")
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	secret, ok := os.LookupEnv("JWT_SECRET_TOKEN")
+	if !ok {
+		log.Println("JWT_SECRET_TOKEN is not present")
+	}
 
 	var s *UserService
 	once.Do(func() {
@@ -27,6 +38,7 @@ func NewUserService(pc *sql.DB) *UserService {
 			authHandler: handlers.NewAuthHandler(pc, secret),
 		}
 	})
+
 	return s
 }
 
