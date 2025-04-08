@@ -2,6 +2,7 @@
 .vscode
 
 *.pb.go
+*pb.gw.go
 
 .env
 config/config.yml
