@@ -1,8 +1,7 @@
 syntax="proto3";
 
-import "google/api/annotations.proto";
+import "pkg/proto/google/api/annotations.proto";
 option go_package="pkg/api/user-service";
-
 
 package user_service;
 
@@ -22,9 +21,7 @@ service User{
             get: "/v1/login"
         };
     };
-
 }
-
 
 //register messages
 message RegisterRequest{
