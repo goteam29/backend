@@ -5,9 +5,9 @@ import (
 )
 
 type User struct {
-	ID        uuid.UUID
-	Name      string
-	Email     string
-	Password  string
-	IsAdmin   bool
+	ID       uuid.UUID
+	Name     string
+	Email    string
+	Password string
+	IsAdmin  bool
 }

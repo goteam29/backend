@@ -4,13 +4,14 @@ import (
 	"api-repository/internal/config"
 	"api-repository/internal/services"
 	"api-repository/internal/services/user-service/service"
-	userservice "api-repository/pkg/api/user-service"
+	user_service "api-repository/pkg/api/user-service"
 	"api-repository/pkg/db/postgres"
-	"google.golang.org/grpc"
 	"log"
 	"net"
 	"strconv"
 	"time"
+
+	"google.golang.org/grpc"
 )
 
 func main() {
@@ -31,7 +32,7 @@ func main() {
 	}
 
 	server := grpc.NewServer()
-	userservice.RegisterUserServer(server, svc)
+	user_service.RegisterUserServer(server, svc)
 
 	log.Print(services.GetServerStartedLogString(cfg, time.Now(), cfg.UserServicePort, "user-service"))
 	log.Fatal(server.Serve(lis))
