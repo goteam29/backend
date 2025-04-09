@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package text_service;
+
+option go_package = "pkg/api/text-service";
+
+
+service Text{
+  rpc CreateLesson(LessonRequest) returns (LessonResponse);
+}
+
+message LessonRequest {
+    string name = 1;
+    string description = 2;
+    string text = 3;
+    string uuid = 4;
+}
+
+message LessonResponse {
+    string name = 1;
+    string description = 2;
+    string text = 3;
+}
