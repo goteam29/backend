@@ -10,6 +10,7 @@ import (
 type MainConfig struct {
 	GatewayPort     int               `yaml:"GATEWAY_PORT" env:"GATEWAY_PORT" env-default:"8080"`
 	UserServicePort int               `yaml:"USER_SERVICE_PORT" env:"USER_SERVICE_PORT" env-default:"50051"`
+	TextServicePort int               `yaml:"TEXT_SERVICE_PORT" env:"TEXT_SERVICE_PORT" env-default:"50052"`
 	POSTGRES        postgres.PgConfig `yaml:"POSTGRES"`
 	REDIS           redis.RConfig     `yaml:"REDIS"`
 	MinIO           minio.MnConfig    `yaml:"MINIO"`
