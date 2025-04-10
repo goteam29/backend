@@ -5,24 +5,18 @@ import (
 	"api-repository/internal/services/file-service/service/internal/handlers"
 	"api-repository/pkg/db/minio"
 	"context"
-	"io"
 	"log"
 	"net"
 	"strconv"
-	"sync"
 
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 
 	pb "api-repository/pkg/api/file-service"
 )
 
 type FileService struct {
-	grpcServer   *grpc.Server
-	minioClient  *minio.Client
-	sourceClient pb.FileClient
-	wg           sync.WaitGroup
-	shutdownChan chan struct{}
+	grpcServer  *grpc.Server
+	minioClient *minio.Client
 }
 
 type fileServer struct {
@@ -40,16 +34,6 @@ func New(cfg *config.MainConfig) (*FileService, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	conn, err := grpc.Dial(
-		cfg.UserServiceAddr,
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	sourceClient := pb.NewFileClient(conn)
 	fileHandler := handlers.NewFileHandler(minioClient)
 
 	grpcServer := grpc.NewServer()
@@ -58,10 +42,8 @@ func New(cfg *config.MainConfig) (*FileService, error) {
 	})
 
 	return &FileService{
-		grpcServer:   grpcServer,
-		minioClient:  minioClient,
-		sourceClient: sourceClient,
-		shutdownChan: make(chan struct{}),
+		grpcServer:  grpcServer,
+		minioClient: minioClient,
 	}, nil
 }
 
@@ -71,63 +53,12 @@ func (s *FileService) Start(port int) error {
 		return err
 	}
 
-	s.wg.Add(1)
-	go func() {
-		defer s.wg.Done()
-		if err := s.grpcServer.Serve(lis); err != nil {
-			log.Printf("gRPC server error: %v", err)
-		}
-	}()
-
-	s.wg.Add(1)
-	go func() {
-		defer s.wg.Done()
-		s.processRequests()
-	}()
-
+	if err := s.grpcServer.Serve(lis); err != nil {
+		log.Printf("gRPC server error: %v", err)
+	}
 	return nil
 }
 
 func (s *FileService) Stop() {
-	close(s.shutdownChan)
 	s.grpcServer.GracefulStop()
-	s.wg.Wait()
-}
-
-func (s *FileService) processRequests() {
-	for {
-		select {
-		case <-s.shutdownChan:
-			return
-		default:
-			stream, err := s.sourceClient.GetFileStream(context.Background(), &pb.EmptyRequest{})
-			if err != nil {
-				log.Printf("Stream error: %v", err)
-				continue
-			}
-			for {
-				req, err := stream.Recv()
-				if err == io.EOF {
-					break
-				}
-				if err != nil {
-					log.Printf("Receive error: %v", err)
-					break
-				}
-				data, err := s.minioClient.GetFile(context.Background(), req.BucketName, req.ObjectKey)
-				if err != nil {
-					log.Printf("File read error: %v", err)
-					continue
-				}
-				_, err = s.sourceClient.ReceiveFile(context.Background(), &pb.ReceiveFileRequest{
-					BucketName: req.BucketName,
-					ObjectKey:  req.ObjectKey,
-					Content:    data,
-				})
-				if err != nil {
-					log.Printf("Send file error: %v", err)
-				}
-			}
-		}
-	}
 }
