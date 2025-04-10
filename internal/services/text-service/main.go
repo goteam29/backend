@@ -5,6 +5,8 @@ import (
 	"api-repository/internal/services/text-service/service"
 	textService "api-repository/pkg/api/text-service"
 	"api-repository/pkg/db/postgres"
+	"api-repository/pkg/db/redis"
+	"context"
 	"log"
 	"net"
 	"strconv"
@@ -13,6 +15,8 @@ import (
 )
 
 func main() {
+	ctx := context.Background()
+
 	cfg, err := config.NewMainConfig()
 	if err != nil {
 		log.Fatalf("can't get env files | err: %v", err)
@@ -22,6 +26,12 @@ func main() {
 	if err != nil {
 		log.Fatalf("can't connect to postgres | err: %v", err)
 	}
+	
+	redisConn := redis.NewRedisConn(cfg.REDIS)
+	_, err = redisConn.Ping(ctx).Result()
+	if err != nil {
+		log.Fatalf("can't connect to redis | err: %v", err)
+	}
 
 	lis, err := net.Listen("tcp", ":"+strconv.Itoa(cfg.TextServicePort))
 	if err != nil {
@@ -29,7 +39,7 @@ func main() {
 	}
 
 	server := grpc.NewServer()
-	svc := service.NewTextService(pgConn)
+	svc := service.NewTextService(pgConn, redisConn)
 	textService.RegisterTextServer(server, svc)
 
 	log.Print("Text service started at port: ", cfg.TextServicePort)

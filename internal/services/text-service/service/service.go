@@ -6,6 +6,8 @@ import (
 	"context"
 	"database/sql"
 	"sync"
+
+	"github.com/redis/go-redis/v9"
 )
 
 var once sync.Once
@@ -16,12 +18,12 @@ type TextService struct {
 	pgConn      *sql.DB
 }
 
-func NewTextService(pc *sql.DB) *TextService {
+func NewTextService(pg *sql.DB, redis *redis.Client) *TextService {
 	var s *TextService
 	once.Do(func() {
 		s = &TextService{
-			pgConn:      pc,
-			textHandler: handlers.NewTextHandler(pc),
+			pgConn:      pg,
+			textHandler: handlers.NewTextHandler(pg, redis),
 		}
 	})
 
