@@ -6,18 +6,71 @@ option go_package = "pkg/api/text-service";
 
 
 service Text{
-  rpc CreateLesson(LessonRequest) returns (LessonResponse);
+  rpc CreateLesson(CreateLessonRequest) returns (CreateLessonResponse);
+  rpc GetLesson(GetLessonRequest) returns (GetLessonResponse);
 }
 
-message LessonRequest {
-    string name = 1;
-    string description = 2;
-    string text = 3;
-    string uuid = 4;
+message Class{
+  int32 number = 1;
+  repeated Subject subjects = 2;
 }
 
-message LessonResponse {
-    string name = 1;
-    string description = 2;
-    string text = 3;
+message GetClassRequest{
+  int32 number = 1;
+}
+message GetClassResponse{
+  Class class = 1;
+}
+
+message CreateClassRequest{
+  Class class = 1;
+}
+
+message CreateClassResponse{
+  Class class = 1;
+}
+
+message Subject{
+  string id = 1;
+  string name = 2;
+  int32 class = 3;
+  repeated Section sections = 4;
+}
+
+
+
+message Section{
+  string id = 1;
+  string subjectId = 2;
+  string name = 3;
+  string description = 4;
+  repeated Lesson lessons = 5;
+}
+
+message Lesson{
+  string id = 1;
+  string sectionId = 2;
+  string name = 3;
+  string description = 4;
+  repeated string videos = 5;
+  repeated string files = 6;
+  repeated string exercises = 7;
+  repeated string comments = 8;
+  int64 rating = 9;
+}
+
+message CreateLessonRequest{
+    Lesson lesson = 1;
+}
+
+message CreateLessonResponse{
+    string response = 1;
+}
+
+message GetLessonRequest{
+    string id = 1;
+}
+
+message GetLessonResponse{
+    Lesson lesson = 1;
 }
