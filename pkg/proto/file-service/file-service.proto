@@ -6,7 +6,9 @@ option go_package = "pkg/api/file-service";
 
 
 service File{
-  rpc GetFile(GetFileRequest) returns (GetFileResponse); // Клиент загружает файл по частям
+  rpc GetFile(GetFileRequest) returns (GetFileResponse);
+  rpc GetFileStream(EmptyRequest) returns (stream FileRequest);
+  rpc ReceiveFile(ReceiveFileRequest) returns (ReceiveFileResponse);
 }
 
 message GetFileRequest {
@@ -20,4 +22,21 @@ message GetFileResponse {
   string content_type = 3;
   int64 size = 4;
   string last_modified = 5;
+}
+
+message EmptyRequest {}
+
+message FileRequest {
+  string bucket_name = 1;
+  string object_key = 2;
+}
+
+message ReceiveFileRequest {
+  string bucket_name = 1;
+  string object_key = 2;
+  bytes content = 3;
+}
+
+message ReceiveFileResponse {
+  string status = 1; 
 }

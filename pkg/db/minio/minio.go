@@ -2,6 +2,8 @@ package minio
 
 import (
 	"context"
+	"io"
+	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -23,6 +25,13 @@ type Client struct {
 	client     *s3.S3
 	uploader   *s3manager.Uploader
 	downloader *s3manager.Downloader
+}
+
+type FileObject struct {
+	Content      []byte
+	ContentType  string
+	Size         int64
+	LastModified string
 }
 
 func New(cfg MnConfig) (*Client, error) {
@@ -54,4 +63,42 @@ func (c *Client) GetFile(ctx context.Context, bucket, key string) ([]byte, error
 		return nil, err
 	}
 	return buf.Bytes(), nil
+}
+
+func (c *Client) GetFileWithMeta(ctx context.Context, bucket, key string) (*FileObject, error) {
+	output, err := c.client.GetObjectWithContext(ctx, &s3.GetObjectInput{
+		Bucket: aws.String(bucket),
+		Key:    aws.String(key),
+	})
+	if err != nil {
+		return nil, err
+	}
+	defer output.Body.Close()
+
+	content, err := io.ReadAll(output.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	contentType := ""
+	if output.ContentType != nil {
+		contentType = *output.ContentType
+	}
+
+	lastModified := ""
+	if output.LastModified != nil {
+		lastModified = output.LastModified.Format(time.RFC3339)
+	}
+
+	size := int64(0)
+	if output.ContentLength != nil {
+		size = *output.ContentLength
+	}
+
+	return &FileObject{
+		Content:      content,
+		ContentType:  contentType,
+		Size:         size,
+		LastModified: lastModified,
+	}, nil
 }
