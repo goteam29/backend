@@ -1,7 +1,8 @@
 package handlers
 
 import (
-	repository "api-repository/internal/services/text-service/service/internal/repository/lesson"
+	postgresRepo "api-repository/internal/services/text-service/service/internal/repository/postgres"
+	redisRepo "api-repository/internal/services/text-service/service/internal/repository/redis"
 	textService "api-repository/pkg/api/text-service"
 	"context"
 	"fmt"
@@ -13,12 +14,12 @@ import (
 func (th *TextHandler) CreateLesson(ctx context.Context, req *textService.CreateLessonRequest) (*textService.CreateLessonResponse, error) {
 	id := uuid.New()
 
-	err := repository.RedisAdd(id, th.redis, req)
+	err := redisRepo.LessonAdd(id, th.redis, req)
 	if err != nil {
 		return nil, fmt.Errorf("createLesson: %v", err)
 	}
 
-	err = repository.PgInsert(id, th.pg, req)
+	err = postgresRepo.LessonInsert(id, th.pg, req)
 	if err != nil {
 		return nil, fmt.Errorf("createLesson: %v", err)
 	}
@@ -29,13 +30,13 @@ func (th *TextHandler) CreateLesson(ctx context.Context, req *textService.Create
 }
 
 func (th *TextHandler) GetLesson(ctx context.Context, req *textService.GetLessonRequest) (*textService.GetLessonResponse, error) {
-	lesson, err := repository.RedisGet(th.redis, ctx, req.Id)
+	lesson, err := redisRepo.LessonGet(th.redis, ctx, req.Id)
 	if err != nil {
 		return nil, fmt.Errorf("getLesson: %v", err)
 	}
 
 	if lesson == nil {
-		lesson, err := repository.PgSelect(th.pg, req)
+		lesson, err := postgresRepo.LessonSelect(th.pg, req)
 		if err != nil {
 			return nil, fmt.Errorf("getLesson: %v", err)
 		}
