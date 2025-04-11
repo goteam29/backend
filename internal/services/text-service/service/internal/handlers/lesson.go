@@ -14,12 +14,12 @@ import (
 func (th *TextHandler) CreateLesson(ctx context.Context, req *textService.CreateLessonRequest) (*textService.CreateLessonResponse, error) {
 	id := uuid.New()
 
-	err := redisRepo.LessonAdd(id, th.redis, req)
+	err := redisRepo.AddLesson(id, th.redis, req)
 	if err != nil {
 		return nil, fmt.Errorf("createLesson: %v", err)
 	}
 
-	err = postgresRepo.LessonInsert(id, th.pg, req)
+	err = postgresRepo.InsertLesson(id, th.pg, req)
 	if err != nil {
 		return nil, fmt.Errorf("createLesson: %v", err)
 	}
@@ -30,13 +30,13 @@ func (th *TextHandler) CreateLesson(ctx context.Context, req *textService.Create
 }
 
 func (th *TextHandler) GetLesson(ctx context.Context, req *textService.GetLessonRequest) (*textService.GetLessonResponse, error) {
-	lesson, err := redisRepo.LessonGet(th.redis, ctx, req.Id)
+	lesson, err := redisRepo.GetLesson(th.redis, ctx, req.Id)
 	if err != nil {
 		return nil, fmt.Errorf("getLesson: %v", err)
 	}
 
 	if lesson == nil {
-		lesson, err := postgresRepo.LessonSelect(th.pg, req)
+		lesson, err := postgresRepo.SelectLesson(th.pg, req)
 		if err != nil {
 			return nil, fmt.Errorf("getLesson: %v", err)
 		}

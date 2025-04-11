@@ -15,7 +15,7 @@ import (
 
 const timeToLive = 30 * time.Second
 
-func LessonAdd(id uuid.UUID, rds *redis.Client, req *textService.CreateLessonRequest) error {
+func AddLesson(id uuid.UUID, rds *redis.Client, req *textService.CreateLessonRequest) error {
 	lessonJSON, err := json.Marshal(req.Lesson)
 	if err != nil {
 		return fmt.Errorf("redisAdd: failed to marshal lesson to JSON: %v", err)
@@ -31,7 +31,7 @@ func LessonAdd(id uuid.UUID, rds *redis.Client, req *textService.CreateLessonReq
 	return nil
 }
 
-func LessonGet(rds *redis.Client, ctx context.Context, id string) (*textService.GetLessonResponse, error) {
+func GetLesson(rds *redis.Client, ctx context.Context, id string) (*textService.GetLessonResponse, error) {
 	lessonJSON, err := rds.Get(ctx, id).Result()
 	if err == redis.Nil {
 		return nil, nil
