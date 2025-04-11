@@ -30,6 +30,14 @@ func NewTextService(pg *sql.DB, redis *redis.Client) *TextService {
 	return s
 }
 
+func (ts *TextService) CreateClass(ctx context.Context, request *textService.CreateClassRequest) (*textService.CreateClassResponse, error) {
+	return ts.textHandler.CreateClass(ctx, request)
+}
+
+func (ts *TextService) GetClasses(ctx context.Context, request *textService.GetClassesRequest) (*textService.GetClassesResponse, error) {
+	return ts.textHandler.GetClasses(ctx)
+}
+
 func (ts *TextService) CreateLesson(ctx context.Context, request *textService.CreateLessonRequest) (*textService.CreateLessonResponse, error) {
 	return ts.textHandler.CreateLesson(ctx, request)
 }

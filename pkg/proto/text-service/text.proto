@@ -6,20 +6,22 @@ option go_package = "pkg/api/text-service";
 
 
 service Text{
+  rpc CreateClass(CreateClassRequest) returns (CreateClassResponse);
+  rpc GetClasses(GetClassesRequest) returns (GetClassesResponse);
+
+  rpc CreateSubject(CreateSubjectRequest) returns (CreateSubjectResponse);
+  rpc GetSubject(GetSubjectRequest) returns (GetSubjectResponse);
+
+  rpc CreateSection(CreateSectionRequest) returns (CreateSectionResponse);
+  rpc GetSection(GetSectionRequest) returns (GetSectionResponse);
+
   rpc CreateLesson(CreateLessonRequest) returns (CreateLessonResponse);
   rpc GetLesson(GetLessonRequest) returns (GetLessonResponse);
 }
 
 message Class{
   int32 number = 1;
-  repeated Subject subjects = 2;
-}
-
-message GetClassRequest{
-  int32 number = 1;
-}
-message GetClassResponse{
-  Class class = 1;
+  repeated string subject_ids = 2;
 }
 
 message CreateClassRequest{
@@ -27,24 +29,60 @@ message CreateClassRequest{
 }
 
 message CreateClassResponse{
-  Class class = 1;
+  string response = 1;
+}
+
+message GetClassesRequest{}
+
+message GetClassesResponse{
+  repeated Class classes = 1;
 }
 
 message Subject{
   string id = 1;
-  string name = 2;
-  int32 class = 3;
-  repeated Section sections = 4;
+  int32 classNumber = 2;
+  string name = 3;
+  repeated string section_ids = 4;
 }
 
+message CreateSubjectRequest{
+    Subject subject = 1;
+}
 
+message CreateSubjectResponse{
+    string response = 1;
+}
+
+message GetSubjectRequest{
+    string id = 1;
+}
+
+message GetSubjectResponse{
+    Subject subject = 1;
+}
 
 message Section{
   string id = 1;
   string subjectId = 2;
   string name = 3;
   string description = 4;
-  repeated Lesson lessons = 5;
+  repeated string lessons_ids = 5;
+}
+
+message CreateSectionRequest{
+    Section section = 1;
+}
+
+message CreateSectionResponse{
+    string response = 1;
+}
+
+message GetSectionRequest{
+    string id = 1;
+}
+
+message GetSectionResponse{
+    Section section = 1;
 }
 
 message Lesson{
@@ -52,11 +90,11 @@ message Lesson{
   string sectionId = 2;
   string name = 3;
   string description = 4;
-  repeated string videos = 5;
-  repeated string files = 6;
-  repeated string exercises = 7;
-  repeated string comments = 8;
-  int64 rating = 9;
+  repeated string video_ids = 5;
+  repeated string file_ids = 6;
+  repeated string exercise_ids = 7;
+  repeated string comment_ids = 8;
+  int32 rating = 9;
 }
 
 message CreateLessonRequest{

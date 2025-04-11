@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func LessonInsert(id uuid.UUID, pg *sql.DB, req *textService.CreateLessonRequest) error {
+func InsertLesson(id uuid.UUID, pg *sql.DB, req *textService.CreateLessonRequest) error {
 	sectionID := uuid.New()
 
 	_, err := pg.Exec("INSERT INTO lessons (id, section_id, name, description) VALUES ($1, $2, $3, $4)",
@@ -24,7 +24,7 @@ func LessonInsert(id uuid.UUID, pg *sql.DB, req *textService.CreateLessonRequest
 	return nil
 }
 
-func LessonSelect(pg *sql.DB, req *textService.GetLessonRequest) (*textService.GetLessonResponse, error) {
+func SelectLesson(pg *sql.DB, req *textService.GetLessonRequest) (*textService.GetLessonResponse, error) {
 	lesson := pg.QueryRow("SELECT id, section_id, name, description FROM lessons WHERE id = $1", req.Id)
 	var lessonID, sectionID, name, description string
 	if err := lesson.Scan(&lessonID, &sectionID, &name, &description); err != nil {
