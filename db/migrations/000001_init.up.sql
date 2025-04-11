@@ -5,6 +5,26 @@ create table if not exists public.users(
     token    text not null
 );
 
+create table if not exists public.classes(
+    number   integer primary key,
+    subjects uuid[]
+);
+
+-- create table if not exists public.subjects(
+--     id           uuid primary key,
+--     name         text not null,
+--     class_number integer not null references public.classes(number) on delete cascade,
+--     sections     uuid[]
+-- );
+
+-- create table if not exists public.sections(
+--     id          uuid primary key,
+--     subject_id  uuid not null references public.subjects(id) on delete cascade,
+--     name        text not null,
+--     description text not null,
+--     lessons     uuid[],
+-- )
+
 create table if not exists public.lessons(
     id          uuid primary key,
     section_id  uuid not null,
@@ -15,6 +35,4 @@ create table if not exists public.lessons(
     exercises   text[],
     comments    text[],
     rating      bigint not null default 0
-    -- constraint fk_section
-    --     foreign key(section) references public.sections(id) on delete cascade
 );
