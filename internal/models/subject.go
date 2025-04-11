@@ -6,5 +6,5 @@ type Subject struct {
 	Id          uuid.UUID
 	Name        string
 	ClassNumber int
-	Sections    []Section
+	Sections    []uuid.UUID
 }
