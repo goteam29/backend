@@ -4,6 +4,7 @@ import (
 	textService "api-repository/pkg/api/text-service"
 	"database/sql"
 	"fmt"
+	"strings"
 )
 
 func InsertClass(db *sql.DB, req *textService.CreateClassRequest) error {
@@ -20,26 +21,30 @@ func SelectClasses(db *sql.DB) (*textService.GetClassesResponse, error) {
 	if err != nil {
 		return nil, fmt.Errorf("pgSelect: failed to select classes from database: %v", err)
 	}
+
+	classesResponse := make([]*textService.Class, 0, 11)
+
 	var (
-		number   int32
-		subjects []string
+		subjectIdsNullable sql.NullString
 	)
 
-	classResponse:=make([]*textService.Class, 11)
-
-	var i int
 	for classes.Next() {
-		err := classes.Scan(&number, &subjects[i])
-		if err!=nil{
-			return nil, fmt.Errorf("pgSelect: failed to scan classes: %v", err)
+		class := &textService.Class{}
+		
+		err := classes.Scan(&class.Number, &subjectIdsNullable)
+		if err != nil {
+			return nil, fmt.Errorf("pgSelect: failed to scan rows: %v", err)
 		}
-		i++
+
+		if subjectIdsNullable.Valid {
+			class.SubjectIds = strings.Split(subjectIdsNullable.String, ",")
+		} else {
+			class.SubjectIds = []string{}
+		}
+		classesResponse = append(classesResponse, class)
 	}
 
-	return *textService.GetClassesResponse{
-		Class: []*textService.Class{
-			Number:     number,
-			SubjectIds: subjects,
-		},
+	return &textService.GetClassesResponse{
+		Class: classesResponse,
 	}, nil
 }

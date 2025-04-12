@@ -30,7 +30,7 @@ func (th *TextHandler) GetClasses(ctx context.Context) (*textService.GetClassesR
 		return nil, fmt.Errorf("getClasses: %v", err)
 	}
 
-	if classes == nil {
+	if len(classes.Class) == 0 {
 		classes, err := postgresRepo.SelectClasses(th.pg)
 		if err != nil {
 			return nil, fmt.Errorf("getClasses: %v", err)
