@@ -34,6 +34,10 @@ func (ts *TextService) GetClasses(ctx context.Context, request *textService.GetC
 	return ts.textHandler.GetClasses(ctx)
 }
 
+func (ts *TextService) CreateSubject(ctx context.Context, request *textService.CreateSubjectRequest) (*textService.CreateSubjectResponse, error) {
+	return ts.textHandler.CreateSubject(ctx, request)
+}
+
 func (ts *TextService) CreateLesson(ctx context.Context, request *textService.CreateLessonRequest) (*textService.CreateLessonResponse, error) {
 	return ts.textHandler.CreateLesson(ctx, request)
 }

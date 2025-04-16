@@ -9,6 +9,7 @@ service Text{
   rpc CreateClass(CreateClassRequest) returns (CreateClassResponse);
   rpc GetClass(GetClassRequest) returns (GetClassResponse);
   rpc GetClasses(GetClassesRequest) returns (GetClassesResponse);
+  rpc UpdateClass(UpdateClassRequest) returns (UpdateClassResponse);
 
   rpc CreateSubject(CreateSubjectRequest) returns (CreateSubjectResponse);
   rpc GetSubject(GetSubjectRequest) returns (GetSubjectResponse);
@@ -45,6 +46,14 @@ message GetClassesRequest{}
 
 message GetClassesResponse{
   repeated Class classes = 1;
+}
+
+message UpdateClassRequest{
+  Class class = 1;
+}
+
+message UpdateClassResponse{
+  string response = 1;
 }
 
 message Subject{
