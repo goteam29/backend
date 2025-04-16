@@ -7,6 +7,7 @@ option go_package = "pkg/api/text-service";
 
 service Text{
   rpc CreateClass(CreateClassRequest) returns (CreateClassResponse);
+  rpc GetClass(GetClassRequest) returns (GetClassResponse);
   rpc GetClasses(GetClassesRequest) returns (GetClassesResponse);
 
   rpc CreateSubject(CreateSubjectRequest) returns (CreateSubjectResponse);
@@ -30,6 +31,14 @@ message CreateClassRequest{
 
 message CreateClassResponse{
   string response = 1;
+}
+
+message GetClassRequest{
+  int32 number = 1;
+}
+
+message GetClassResponse{
+  Class class = 1;
 }
 
 message GetClassesRequest{}

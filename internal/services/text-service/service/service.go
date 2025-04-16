@@ -5,33 +5,29 @@ import (
 	textService "api-repository/pkg/api/text-service"
 	"context"
 	"database/sql"
-	"sync"
 
 	"github.com/redis/go-redis/v9"
 )
 
-var once sync.Once
-
 type TextService struct {
 	textService.UnimplementedTextServer
-	textHandler *handlers.TextHandler
 	pgConn      *sql.DB
+	textHandler *handlers.TextHandler
 }
 
-func NewTextService(pg *sql.DB, redis *redis.Client) *TextService {
-	var s *TextService
-	once.Do(func() {
-		s = &TextService{
-			pgConn:      pg,
-			textHandler: handlers.NewTextHandler(pg, redis),
-		}
-	})
-
-	return s
+func NewTextService(pg *sql.DB, rds *redis.Client) *TextService {
+	return &TextService{
+		pgConn:      pg,
+		textHandler: handlers.NewTextHandler(pg, rds),
+	}
 }
 
 func (ts *TextService) CreateClass(ctx context.Context, request *textService.CreateClassRequest) (*textService.CreateClassResponse, error) {
 	return ts.textHandler.CreateClass(ctx, request)
+}
+
+func (ts *TextService) GetClass(ctx context.Context, request *textService.GetClassRequest) (*textService.GetClassResponse, error) {
+	return ts.textHandler.GetClass(ctx, request)
 }
 
 func (ts *TextService) GetClasses(ctx context.Context, request *textService.GetClassesRequest) (*textService.GetClassesResponse, error) {

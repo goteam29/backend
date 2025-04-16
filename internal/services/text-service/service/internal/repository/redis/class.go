@@ -23,23 +23,43 @@ func AddClass(rds *redis.Client, req *textService.CreateClassRequest) error {
 	return nil
 }
 
-func GetClasses(rds *redis.Client, ctx context.Context) (*textService.GetClassesResponse, error) {
-	classes, err := rds.HGetAll(ctx, "class").Result()
+func GetClass(ctx context.Context, rds *redis.Client, req *textService.GetClassRequest) (*textService.GetClassResponse, error) {
+	classResponse := &textService.GetClassResponse{}
+
+	classJSON, err := rds.HGet(ctx, "class", fmt.Sprint(req.Number)).Result()
 	if err != nil {
-		return nil, fmt.Errorf("redisGet: failed to get class from Redis: %v", err)
+		if err == redis.Nil {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("redisGetClass: failed to get class from Redis: %v", err)
 	}
 
-	classesResponse := make([]*textService.Class, len(classes))
-	var i int
-	for key := range classes {
-		err := json.Unmarshal([]byte(classes[key]), &classesResponse[i])
+	err = json.Unmarshal([]byte(classJSON), classResponse)
+	if err != nil {
+		return nil, fmt.Errorf("redisGetClass: failed to unmarshall class from JSON: %v", err)
+	}
+
+	return classResponse, nil
+}
+
+func GetClasses(rds *redis.Client, ctx context.Context) (*textService.GetClassesResponse, error) {
+	classesMap, err := rds.HGetAll(ctx, "class").Result()
+	if err != nil {
+		return nil, fmt.Errorf("redisGetClasses: failed to get classes from Redis: %v", err)
+	}
+
+	classesResponse := make([]*textService.Class, 0, len(classesMap))
+
+	for _, classJSON := range classesMap {
+		var class textService.Class
+		err := json.Unmarshal([]byte(classJSON), &class)
 		if err != nil {
-			return nil, fmt.Errorf("redisGet: failed to unmarshall class from JSON: %v", err)
+			return nil, fmt.Errorf("redisGetClasses: failed to unmarshall class from JSON: %v", err)
 		}
-		i++
+		classesResponse = append(classesResponse, &class)
 	}
 
 	return &textService.GetClassesResponse{
-		Class: classesResponse,
+		Classes: classesResponse,
 	}, nil
 }

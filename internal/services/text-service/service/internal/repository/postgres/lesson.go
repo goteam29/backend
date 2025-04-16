@@ -18,25 +18,24 @@ func InsertLesson(id uuid.UUID, pg *sql.DB, req *textService.CreateLessonRequest
 		req.Lesson.Description,
 	)
 	if err != nil {
-		return fmt.Errorf("pgInsert: failed to insert lesson into database: %v", err)
+		return fmt.Errorf("pgInsertLesson: failed to insert lesson into database: %v", err)
 	}
 
 	return nil
 }
 
 func SelectLesson(pg *sql.DB, req *textService.GetLessonRequest) (*textService.GetLessonResponse, error) {
+	lessonResponse := &textService.GetLessonResponse{}
+
 	lesson := pg.QueryRow("SELECT id, section_id, name, description FROM lessons WHERE id = $1", req.Id)
-	var lessonID, sectionID, name, description string
-	if err := lesson.Scan(&lessonID, &sectionID, &name, &description); err != nil {
-		return nil, fmt.Errorf("pgSelect: failed to scan lesson: %v", err)
+	err := lesson.Scan(
+		&lessonResponse.Lesson.Id, &lessonResponse.Lesson.SectionId,
+		&lessonResponse.Lesson.Name, &lessonResponse.Lesson.Description)
+	if err != nil {
+		return nil, fmt.Errorf("pgSelectLesson: failed to scan lesson: %v", err)
 	}
 
 	return &textService.GetLessonResponse{
-		Lesson: &textService.Lesson{
-			Id:          lessonID,
-			SectionId:   sectionID,
-			Name:        name,
-			Description: description,
-		},
+		Lesson: lessonResponse.Lesson,
 	}, nil
 }
