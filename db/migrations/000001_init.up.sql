@@ -10,12 +10,12 @@ create table if not exists public.classes(
     subject_ids uuid[]
 );
 
--- create table if not exists public.subjects(
---     id           uuid primary key,
---     name         text not null,
---     class_number integer not null references public.classes(number) on delete cascade,
---     section_ids     uuid[]
--- );
+create table if not exists public.subjects(
+    id           uuid primary key,
+    name         text not null,
+    class_number integer not null references public.classes(number) on delete cascade,
+    section_ids     uuid[]
+);
 
 -- create table if not exists public.sections(
 --     id          uuid primary key,
