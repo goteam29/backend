@@ -64,3 +64,12 @@ func SelectClasses(db *sql.DB) (*textService.GetClassesResponse, error) {
 		Classes: classesResponse,
 	}, nil
 }
+
+func UpdateClass(db *sql.DB, req *textService.UpdateClassRequest) error {
+	_, err := db.Exec("UPDATE classes SET subject_ids = array_append(subject_ids, $1) WHERE number = $2", req.Class.SubjectIds[0], req.Class.Number)
+	if err != nil {
+		return fmt.Errorf("pgUpdateClass: failed to update class in database: %v", err)
+	}
+
+	return nil
+}
