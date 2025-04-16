@@ -7,14 +7,14 @@ create table if not exists public.users(
 
 create table if not exists public.classes(
     number   integer primary key,
-    subjects uuid[]
+    subject_ids uuid[]
 );
 
 -- create table if not exists public.subjects(
 --     id           uuid primary key,
 --     name         text not null,
 --     class_number integer not null references public.classes(number) on delete cascade,
---     sections     uuid[]
+--     section_ids     uuid[]
 -- );
 
 -- create table if not exists public.sections(
@@ -22,7 +22,7 @@ create table if not exists public.classes(
 --     subject_id  uuid not null references public.subjects(id) on delete cascade,
 --     name        text not null,
 --     description text not null,
---     lessons     uuid[],
+--     lesson_ids     uuid[],
 -- )
 
 create table if not exists public.lessons(
