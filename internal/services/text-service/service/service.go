@@ -38,6 +38,14 @@ func (ts *TextService) CreateSubject(ctx context.Context, request *textService.C
 	return ts.textHandler.CreateSubject(ctx, request)
 }
 
+func (ts *TextService) GetSubject(ctx context.Context, request *textService.GetSubjectRequest) (*textService.GetSubjectResponse, error) {
+	return ts.textHandler.GetSubject(ctx, request)
+}
+
+func (ts *TextService) GetSubjects(ctx context.Context, request *textService.GetSubjectsRequest) (*textService.GetSubjectsResponse, error) {
+	return ts.textHandler.GetSubjects(ctx)
+}
+
 func (ts *TextService) CreateLesson(ctx context.Context, request *textService.CreateLessonRequest) (*textService.CreateLessonResponse, error) {
 	return ts.textHandler.CreateLesson(ctx, request)
 }

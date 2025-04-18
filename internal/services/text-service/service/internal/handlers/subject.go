@@ -39,38 +39,38 @@ func (th *TextHandler) CreateSubject(ctx context.Context, req *textService.Creat
 	}, nil
 }
 
-// func (th *TextHandler) GetSubject(ctx context.Context, req *textService.GetSubjectRequest) (*textService.GetSubjectResponse, error) {
-// 	Subject, err := redisRepo.GetSubject(ctx, th.redis, req)
-// 	if err != nil {
-// 		return nil, fmt.Errorf("getSubject: %v", err)
-// 	}
+func (th *TextHandler) GetSubject(ctx context.Context, req *textService.GetSubjectRequest) (*textService.GetSubjectResponse, error) {
+	// subject, err := redisRepo.GetSubject(ctx, th.redis, req)
+	// if err != nil {
+	// 	return nil, fmt.Errorf("getSubject: %v", err)
+	// }
 
-// 	if Subject == nil {
-// 		Subject, err = postgresRepo.SelectSubject(th.pg, req)
-// 		if err != nil {
-// 			return nil, fmt.Errorf("getSubject: %v", err)
-// 		}
+	// if Subject == nil {
+	subject, err := postgresRepo.SelectSubject(th.pg, req)
+	if err != nil {
+		return nil, fmt.Errorf("getSubject: %v", err)
+	}
 
-// 		return Subject, nil
-// 	}
+	return subject, nil
+	// }
 
-// 	return Subject, nil
-// }
+	// 	return Subject, nil
+}
 
-// func (th *TextHandler) GetSubjects(ctx context.Context) (*textService.GetSubjectesResponse, error) {
-// 	Subjectes, err := redisRepo.GetSubjectes(th.redis, ctx)
-// 	if err != nil {
-// 		return nil, fmt.Errorf("getSubjectes: %v", err)
-// 	}
+func (th *TextHandler) GetSubjects(ctx context.Context) (*textService.GetSubjectsResponse, error) {
+	// Subjectes, err := redisRepo.GetSubjectes(th.redis, ctx)
+	// if err != nil {
+	// 	return nil, fmt.Errorf("getSubjectes: %v", err)
+	// }
 
-// 	if len(Subjectes.Subjectes) == 0 {
-// 		Subjectes, err := postgresRepo.SelectSubjectes(th.pg)
-// 		if err != nil {
-// 			return nil, fmt.Errorf("getSubjectes: %v", err)
-// 		}
+	// if len(Subjectes.Subjectes) == 0 {
+	Subjectes, err := postgresRepo.SelectSubjects(th.pg)
+	if err != nil {
+		return nil, fmt.Errorf("getSubjectes: %v", err)
+	}
 
-// 		return Subjectes, nil
-// 	}
+	return Subjectes, nil
+	// }
 
-// 	return Subjectes, nil
-// }
+	// return Subjectes, nil
+}

@@ -19,50 +19,53 @@ func InsertSubject(db *sql.DB, req *textService.CreateSubjectRequest, id uuid.UU
 	return nil
 }
 
-// func SelectSubject(db *sql.DB, req *textService.GetSubjectRequest) (*textService.GetSubjectResponse, error) {
-// 	subjectResponse := &textService.GetSubjectResponse{
-// 		Subject: &textService.Subject{
-// 			SectionIds: make([]string, 0),
-// 		},
-// 	}
+func SelectSubject(db *sql.DB, req *textService.GetSubjectRequest) (*textService.GetSubjectResponse, error) {
+	subjectResponse := &textService.GetSubjectResponse{
+		Subject: &textService.Subject{
+			Id:          "",
+			Name:        "",
+			ClassNumber: 0,
+			SectionIds:  make([]string, 0),
+		},
+	}
 
-// 	subject := db.QueryRow("SELECT number, subject_ids FROM subjects WHERE number = ($1)", req.Number)
-// 	err := subject.Scan(&subjectResponse.Subject.Number, pq.Array(&subjectResponse.Subject.SubjectIds))
-// 	if err != nil {
-// 		return nil, fmt.Errorf("pgSelectSubject: failed to scan subject: %v", err)
-// 	}
+	subject := db.QueryRow("SELECT id, name, class_number, section_ids FROM subjects WHERE id = ($1)", req.Id)
+	err := subject.Scan(&subjectResponse.Subject.Id, &subjectResponse.Subject.Name, &subjectResponse.Subject.ClassNumber, pq.Array(&subjectResponse.Subject.SectionIds))
+	if err != nil {
+		return nil, fmt.Errorf("pgSelectSubject: failed to scan subject: %v", err)
+	}
 
-// 	return subjectResponse, nil
-// }
+	return subjectResponse, nil
+}
 
-// func SelectSubjects(db *sql.DB) (*textService.GetSubjectesResponse, error) {
-// 	subjects, err := db.Query("SELECT number, subject_ids FROM subjects")
-// 	if err != nil {
-// 		return nil, fmt.Errorf("pgSelectSubjectes: failed to select subjects from database: %v", err)
-// 	}
-// 	defer subjects.Close()
+func SelectSubjects(db *sql.DB) (*textService.GetSubjectsResponse, error) {
+	subjects, err := db.Query("SELECT id, name, class_number, section_ids FROM subjects")
+	if err != nil {
+		return nil, fmt.Errorf("pgSelectSubjects: failed to select subjects from database: %v", err)
+	}
+	defer subjects.Close()
 
-// 	subjectsResponse := make([]*textService.Subject, 0, 11)
+	subjectsResponse := make([]*textService.Subject, 0, 11)
 
-// 	for subjects.Next() {
-// 		subject := &textService.Subject{}
-// 		var subjectIds pq.StringArray
+	for subjects.Next() {
+		subject := &textService.Subject{}
+		var sectionIds pq.StringArray
 
-// 		err := subjects.Scan(&subject.Number, &subjectIds)
-// 		if err != nil {
-// 			return nil, fmt.Errorf("pgSelectSubjectes: failed to scan rows: %v", err)
-// 		}
+		err := subjects.Scan(&subject.Id, &subject.Name, &subject.ClassNumber, &sectionIds)
+		if err != nil {
+			return nil, fmt.Errorf("pgSelectSubjectes: failed to scan rows: %v", err)
+		}
 
-// 		subject.SubjectIds = subjectIds
+		subject.SectionIds = sectionIds
 
-// 		subjectsResponse = append(subjectsResponse, subject)
-// 	}
+		subjectsResponse = append(subjectsResponse, subject)
+	}
 
-// 	if err := subjects.Err(); err != nil {
-// 		return nil, fmt.Errorf("pgSelectSubjectes: error during rows iteration: %v", err)
-// 	}
+	if err := subjects.Err(); err != nil {
+		return nil, fmt.Errorf("pgSelectSubjectes: error during rows iteration: %v", err)
+	}
 
-// 	return &textService.GetSubjectesResponse{
-// 		Subjectes: subjectsResponse,
-// 	}, nil
-// }
+	return &textService.GetSubjectsResponse{
+		Subjects: subjectsResponse,
+	}, nil
+}

@@ -13,6 +13,7 @@ service Text{
 
   rpc CreateSubject(CreateSubjectRequest) returns (CreateSubjectResponse);
   rpc GetSubject(GetSubjectRequest) returns (GetSubjectResponse);
+  rpc GetSubjects(GetSubjectsRequest) returns (GetSubjectsResponse);
 
   rpc CreateSection(CreateSectionRequest) returns (CreateSectionResponse);
   rpc GetSection(GetSectionRequest) returns (GetSectionResponse);
@@ -77,6 +78,12 @@ message GetSubjectRequest{
 
 message GetSubjectResponse{
     Subject subject = 1;
+}
+
+message GetSubjectsRequest{}
+
+message GetSubjectsResponse{
+    repeated Subject subjects = 1;
 }
 
 message Section{
