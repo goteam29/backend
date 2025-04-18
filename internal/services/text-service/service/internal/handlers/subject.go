@@ -22,14 +22,14 @@ func (th *TextHandler) CreateSubject(ctx context.Context, req *textService.Creat
 		return nil, fmt.Errorf("createSubject: %v", err)
 	}
 
-	updateRequest := &textService.UpdateClassRequest{
+	updateRequest := &textService.AddSubjectInClassRequest{
 		Class: &textService.Class{
 			Number:     req.Subject.ClassNumber,
 			SubjectIds: []string{id.String()},
 		},
 	}
 
-	err = postgresRepo.UpdateClass(th.pg, updateRequest)
+	err = postgresRepo.AddSubjectInClass(th.pg, updateRequest)
 	if err != nil {
 		return nil, fmt.Errorf("createSubject: %v", err)
 	}
@@ -73,4 +73,20 @@ func (th *TextHandler) GetSubjects(ctx context.Context) (*textService.GetSubject
 	// }
 
 	// return Subjectes, nil
+}
+
+func (th *TextHandler) UpdateSubject(ctx context.Context, req *textService.UpdateSubjectRequest) (*textService.UpdateSubjectResponse, error) {
+	// err := redisRepo.UpdateSubject(th.redis, req)
+	// if err != nil {
+	// 	return nil, fmt.Errorf("updateSubject: %v", err)
+	// }
+
+	err := postgresRepo.UpdateSubject(th.pg, req)
+	if err != nil {
+		return nil, fmt.Errorf("updateSubject: %v", err)
+	}
+
+	return &textService.UpdateSubjectResponse{
+		Response: "Subject updated successfully",
+	}, nil
 }

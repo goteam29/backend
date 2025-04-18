@@ -69,3 +69,13 @@ func SelectSubjects(db *sql.DB) (*textService.GetSubjectsResponse, error) {
 		Subjects: subjectsResponse,
 	}, nil
 }
+
+func UpdateSubject(db *sql.DB, req *textService.UpdateSubjectRequest) error {	
+	_, err := db.Exec("UPDATE subjects SET name = $1, class_number = $2, section_ids = array_append(section_ids, $3) WHERE id = $4",
+		req.Subject.Name, req.Subject.ClassNumber, req.Subject.SectionIds[0], req.Subject.Id)
+	if err != nil {
+		return fmt.Errorf("pgUpdateSubject: failed to update subject in database: %v", err)
+	}
+
+	return nil
+}
