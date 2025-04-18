@@ -71,7 +71,7 @@ func (th *TextHandler) AddSubjectInClass(ctx context.Context, req *textService.A
 }
 
 func (th *TextHandler) RemoveSubjectFromClass(ctx context.Context, req *textService.RemoveSubjectFromClassRequest) (*textService.RemoveSubjectFromClassResponse, error) {
-	subjectId, err := postgresRepo.RemoveSubjectFromClass(th.pg, req)
+	subjectId, err := postgresRepo.RemoveSubjectFromClass(ctx, th.pg, req)
 	if err != nil {
 		return nil, fmt.Errorf("updateClass: %v", err)
 	}
@@ -85,7 +85,7 @@ func (th *TextHandler) DeleteClass(ctx context.Context, req *textService.DeleteC
 	// 	return nil, fmt.Errorf("deleteClass: %v", err)
 	// }
 
-	id, err := postgresRepo.DeleteClass(th.pg, req)
+	id, err := postgresRepo.DeleteClass(ctx, th.pg, req)
 	if err != nil {
 		return nil, fmt.Errorf("deleteClass: %v", err)
 	}
