@@ -17,17 +17,17 @@ create table if not exists public.subjects(
     section_ids     uuid[]
 );
 
--- create table if not exists public.sections(
---     id          uuid primary key,
---     subject_id  uuid not null references public.subjects(id) on delete cascade,
---     name        text not null,
---     description text not null,
---     lesson_ids     uuid[],
--- )
+create table if not exists public.sections(
+    id          uuid primary key,
+    subject_id  uuid not null references public.subjects(id) on delete cascade,
+    name        text not null,
+    description text not null,
+    lesson_ids     uuid[]
+);
 
 create table if not exists public.lessons(
     id          uuid primary key,
-    section_id  uuid not null,
+    section_id  uuid not null references public.sections(id) on delete cascade,
     name        text not null,
     description text not null,
     videos      text[],
