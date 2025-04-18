@@ -2,103 +2,205 @@ package repository
 
 import (
 	textService "api-repository/pkg/api/text-service"
+	"context"
 	"database/sql"
 	"fmt"
 
+	"github.com/google/uuid"
 	"github.com/lib/pq"
 )
 
-func InsertClass(db *sql.DB, req *textService.CreateClassRequest) error {
-	_, err := db.Exec("INSERT INTO classes (number, subject_ids) VALUES ($1, $2)", req.Class.ClassNumber, pq.Array(req.Class.SubjectIds))
+func InsertClass(ctx context.Context, db *sql.DB, req *textService.CreateClassRequest) (*textService.CreateClassResponse, error) {
+	id := uuid.New()
+
+	_, err := db.Exec("INSERT INTO classes (id, number) VALUES ($1, $2)", id, req.Number)
 	if err != nil {
-		return fmt.Errorf("pgInsertClass: failed to insert class into database: %v", err)
+		return nil, fmt.Errorf("pgInsertClass: failed to insert class in classes: %v", err)
 	}
 
-	return nil
+	return &textService.CreateClassResponse{
+		Id: id.String(),
+	}, nil
 }
 
-func SelectClass(db *sql.DB, req *textService.GetClassRequest) (*textService.GetClassResponse, error) {
-	classResponse := &textService.GetClassResponse{
-		Class: &textService.Class{
-			SubjectIds: make([]string, 0),
-		},
-	}
+func SelectClass(ctx context.Context, db *sql.DB, req *textService.GetClassRequest) (*textService.GetClassResponse, error) {
+	var (
+		id         string
+		number     int32
+		subjectIds pq.StringArray
+	)
 
-	class := db.QueryRow("SELECT number, subject_ids FROM classes WHERE number = ($1)", req.ClassNumber)
-	err := class.Scan(&classResponse.Class.ClassNumber, pq.Array(&classResponse.Class.SubjectIds))
+	tx, err := db.BeginTx(ctx, &sql.TxOptions{ReadOnly: true})
 	if err != nil {
+		return nil, fmt.Errorf("pgSelectClass: failed to begin transaction: %v", err)
+	}
+	defer tx.Rollback()
+
+	classRow := tx.QueryRow("SELECT id, number FROM classes WHERE id = $1", req.Id)
+	err = classRow.Scan(&id, &number)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			tx.Commit()
+			return nil, nil
+		}
 		return nil, fmt.Errorf("pgSelectClass: failed to scan class: %v", err)
 	}
 
-	return classResponse, nil
+	subjectRows, err := tx.Query("SELECT subject_id FROM classes_subjects WHERE class_id = $1", id)
+	if err != nil {
+		return nil, fmt.Errorf("pgSelectClass: failed to select subjects: %v", err)
+	}
+	defer subjectRows.Close()
+
+	for subjectRows.Next() {
+		var subjectId uuid.UUID
+		err := subjectRows.Scan(&subjectId)
+		if err != nil {
+			return nil, fmt.Errorf("pgSelectClass: failed to scan subject id: %v", err)
+		}
+		subjectIds = append(subjectIds, subjectId.String())
+	}
+
+	if err := subjectRows.Err(); err != nil {
+		return nil, fmt.Errorf("pgSelectClass: failed to iterate over subject rows: %v", err)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil, fmt.Errorf("pgSelectClass: failed to commit transaction: %v", err)
+	}
+
+	return &textService.GetClassResponse{
+		Class: &textService.Class{
+			Id:         id,
+			Number:     number,
+			SubjectIds: subjectIds,
+		},
+	}, nil
 }
 
-func SelectClasses(db *sql.DB) (*textService.GetClassesResponse, error) {
-	classes, err := db.Query("SELECT number, subject_ids FROM classes")
+func SelectClasses(ctx context.Context, db *sql.DB) (*textService.GetClassesResponse, error) {
+	classes := make([]*textService.Class, 0, 11)
+
+	tx, err := db.BeginTx(ctx, &sql.TxOptions{ReadOnly: true})
+	if err != nil {
+		return nil, fmt.Errorf("pgSelectClasses: failed to begin transaction: %v", err)
+	}
+	defer tx.Rollback()
+
+	classRows, err := db.Query("SELECT id, number FROM classes")
 	if err != nil {
 		return nil, fmt.Errorf("pgSelectClasses: failed to select classes from database: %v", err)
 	}
-	defer classes.Close()
+	defer classRows.Close()
 
-	classesResponse := make([]*textService.Class, 0, 11)
-
-	for classes.Next() {
+	for classRows.Next() {
+		var (
+			id         string
+			number     int32
+			subjectIds pq.StringArray
+		)
 		class := &textService.Class{}
-		var subjectIds pq.StringArray
 
-		err := classes.Scan(&class.ClassNumber, &subjectIds)
+		err := classRows.Scan(&id, &number)
 		if err != nil {
 			return nil, fmt.Errorf("pgSelectClasses: failed to scan rows: %v", err)
 		}
 
+		subjectRows, err := tx.Query("SELECT subject_id FROM classes_subjects WHERE class_id = $1", id)
+		if err != nil {
+			return nil, fmt.Errorf("pgSelectClasses: failed to select subjects: %v", err)
+		}
+		defer subjectRows.Close()
+
+		for subjectRows.Next() {
+			var subjectId uuid.UUID
+			err := subjectRows.Scan(&subjectId)
+			if err != nil {
+				return nil, fmt.Errorf("pgSelectClasses: failed to scan subject id: %v", err)
+			}
+			subjectIds = append(subjectIds, subjectId.String())
+		}
+
+		if err := subjectRows.Err(); err != nil {
+			return nil, fmt.Errorf("pgSelectClasses: failed to iterate over subject rows: %v", err)
+		}
+
+		class.Id = id
+		class.Number = number
 		class.SubjectIds = subjectIds
 
-		classesResponse = append(classesResponse, class)
+		classes = append(classes, class)
 	}
 
-	if err := classes.Err(); err != nil {
-		return nil, fmt.Errorf("pgSelectClasses: error during rows iteration: %v", err)
+	if err := classRows.Err(); err != nil {
+		return nil, fmt.Errorf("pgSelectClasses: failed to iterate over class rows: %v", err)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil, fmt.Errorf("pgSelectClass: failed to commit transaction: %v", err)
 	}
 
 	return &textService.GetClassesResponse{
-		Classes: classesResponse,
+		Classes: classes,
 	}, nil
 }
 
-func AddSubjectInClass(db *sql.DB, req *textService.AddSubjectInClassRequest) error {
-	if len(req.SubjectIds) == 0 {
-		return fmt.Errorf("pgUpdateClass: no subject IDs provided")
+func AddSubjectInClass(ctx context.Context, db *sql.DB, req *textService.AddSubjectInClassRequest) (*textService.AddSubjectInClassResponse, error) {
+	var subjectId string
+
+	tx, err := db.BeginTx(ctx, &sql.TxOptions{ReadOnly: true})
+	if err != nil {
+		return nil, fmt.Errorf("pgAddSubjectInClass: failed to begin transaction: %v", err)
+	}
+	defer tx.Rollback()
+
+	// check if subject exists
+	subjectRow := db.QueryRow("SELECT id FROM subjects WHERE id = $1", req.SubjectId)
+	err = subjectRow.Scan(&subjectId)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			tx.Commit()
+			return nil, nil
+		} else {
+			return nil, fmt.Errorf("pgAddSubjectInClass: failed to scan subject: %v", err)
+		}
 	}
 
-	if len(req.SubjectIds) > 0 {
-		_, err := db.Exec("UPDATE classes SET subject_ids = subject_ids || $1 WHERE number = $2", pq.Array(req.SubjectIds), req.ClassNumber)
-		if err != nil {
-			return fmt.Errorf("pgUpdateClass: failed to add classes in database: %v", err)
-		}
-	} else {
-		_, err := db.Exec("UPDATE classes SET subject_ids = array_append(subject_ids, $1) WHERE number = $2", req.SubjectIds[0], req.ClassNumber)
-		if err != nil {
-			return fmt.Errorf("pgUpdateClass: failed to add class in database: %v", err)
-		}
+	_, err = db.Exec("INSERT INTO classes_subjects (class_id, subject_id) VALUES ($1, $2)", req.Id, req.SubjectId)
+	if err != nil {
+		return nil, fmt.Errorf("pgAddSubjectInClass: failed to insert subject in classes_subjects: %v", err)
 	}
 
-	return nil
+	err = tx.Commit()
+	if err != nil {
+		return nil, fmt.Errorf("pgAddSubjectInClass: failed to commit transaction: %v", err)
+	}
+
+	return &textService.AddSubjectInClassResponse{
+		SubjectId: req.SubjectId,
+	}, nil
 }
 
-func RemoveSubjectFromClass(db *sql.DB, req *textService.RemoveSubjectFromClassRequest) error {
-	_, err := db.Exec("UPDATE classes SET subject_ids = array_remove(subject_ids, $1) WHERE number = $2", req.SubjectId, req.ClassNumber)
+func RemoveSubjectFromClass(db *sql.DB, req *textService.RemoveSubjectFromClassRequest) (*textService.RemoveSubjectFromClassResponse, error) {
+	_, err := db.Exec("DELETE FROM classes_subjects WHERE class_id = $1 AND subject_id = $2", req.Id, req.SubjectId)
 	if err != nil {
-		return fmt.Errorf("pgUpdateClass: failed to remove class in database: %v", err)
+		return nil, fmt.Errorf("pgUpdateClass: failed to remove subject from classes_subjects: %v", err)
 	}
 
-	return nil
+	return &textService.RemoveSubjectFromClassResponse{
+		SubjectId: req.SubjectId,
+	}, nil
 }
 
-func DeleteClass(db *sql.DB, req *textService.DeleteClassRequest) error {
-	_, err := db.Exec("DELETE FROM classes WHERE number = $1", req.Number)
+func DeleteClass(db *sql.DB, req *textService.DeleteClassRequest) (*textService.DeleteClassResponse, error) {
+	_, err := db.Exec("DELETE FROM classes WHERE id = $1", req.Id)
 	if err != nil {
-		return fmt.Errorf("pgDeleteClass: failed to delete class in database: %v", err)
+		return nil, fmt.Errorf("pgDeleteClass: failed to delete class in database: %v", err)
 	}
 
-	return nil
+	return &textService.DeleteClassResponse{
+		Id: req.Id,
+	}, nil
 }

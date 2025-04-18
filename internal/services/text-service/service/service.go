@@ -49,7 +49,7 @@ func (ts *TextService) RemoveSubjectFromClass(ctx context.Context, request *text
 	return ts.textHandler.RemoveSubjectFromClass(ctx, request)
 }
 
-// Delete
+// // Delete
 
 func (ts *TextService) DeleteClass(ctx context.Context, request *textService.DeleteClassRequest) (*textService.DeleteClassResponse, error) {
 	return ts.textHandler.DeleteClass(ctx, request)
@@ -82,6 +82,34 @@ func (ts *TextService) DeleteSubject(ctx context.Context, request *textService.D
 	return ts.textHandler.DeleteSubject(ctx, request)
 }
 
+//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// Section
+
+// func (ts *TextService) CreateSection(ctx context.Context, request *textService.CreateSectionRequest) (*textService.CreateSectionResponse, error) {
+// 	return ts.textHandler.CreateSection(ctx, request)
+// }
+
+// func (ts *TextService) GetSection(ctx context.Context, request *textService.GetSectionRequest) (*textService.GetSectionResponse, error) {
+// 	return ts.textHandler.GetSection(ctx, request)
+// }
+
+// func (ts *TextService) GetSections(ctx context.Context, request *textService.GetSectionsRequest) (*textService.GetSectionsResponse, error) {
+// 	return ts.textHandler.GetSections(ctx)
+// }
+
+// func (ts *TextService) AddLessonsInSection(ctx context.Context, request *textService.AddLessonsInSectionRequest) (*textService.AddLessonsInSectionResponse, error) {
+// 	return ts.textHandler.AddLessonsInSection(ctx, request)
+// }
+
+// func (ts *TextService) RemoveLessonsFromSection(ctx context.Context, request *textService.RemoveLessonFromSectionRequest) (*textService.RemoveLessonFromSectionResponse, error) {
+// 	return ts.textHandler.RemoveLessonsFromSection(ctx, request)
+// }
+
+// func (ts *TextService) DeleteSection(ctx context.Context, request *textService.DeleteSectionRequest) (*textService.DeleteSectionResponse, error) {
+// 	return ts.textHandler.DeleteSection(ctx, request)
+// }
+
+//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // Lesson
 
 func (ts *TextService) CreateLesson(ctx context.Context, request *textService.CreateLessonRequest) (*textService.CreateLessonResponse, error) {

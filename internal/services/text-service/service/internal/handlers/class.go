@@ -13,14 +13,12 @@ func (th *TextHandler) CreateClass(ctx context.Context, req *textService.CreateC
 	// 	return nil, fmt.Errorf("createClass: %v", err)
 	// }
 
-	err := postgresRepo.InsertClass(th.pg, req)
+	id, err := postgresRepo.InsertClass(ctx, th.pg, req)
 	if err != nil {
 		return nil, fmt.Errorf("createClass: %v", err)
 	}
 
-	return &textService.CreateClassResponse{
-		Response: "class created successfully",
-	}, nil
+	return id, nil
 }
 
 func (th *TextHandler) GetClass(ctx context.Context, req *textService.GetClassRequest) (*textService.GetClassResponse, error) {
@@ -30,7 +28,7 @@ func (th *TextHandler) GetClass(ctx context.Context, req *textService.GetClassRe
 	// }
 
 	// if class == nil {
-	class, err := postgresRepo.SelectClass(th.pg, req)
+	class, err := postgresRepo.SelectClass(ctx, th.pg, req)
 	if err != nil {
 		return nil, fmt.Errorf("getClass: %v", err)
 	}
@@ -48,7 +46,7 @@ func (th *TextHandler) GetClasses(ctx context.Context) (*textService.GetClassesR
 	// }
 
 	// if len(classes.Classes) == 0 {
-	classes, err := postgresRepo.SelectClasses(th.pg)
+	classes, err := postgresRepo.SelectClasses(ctx, th.pg)
 	if err != nil {
 		return nil, fmt.Errorf("getClasses: %v", err)
 	}
@@ -60,25 +58,25 @@ func (th *TextHandler) GetClasses(ctx context.Context) (*textService.GetClassesR
 }
 
 func (th *TextHandler) AddSubjectInClass(ctx context.Context, req *textService.AddSubjectInClassRequest) (*textService.AddSubjectInClassResponse, error) {
-	err := postgresRepo.AddSubjectInClass(th.pg, req)
+	subjectId, err := postgresRepo.AddSubjectInClass(ctx, th.pg, req)
 	if err != nil {
 		return nil, fmt.Errorf("updateClass: %v", err)
 	}
 
-	return &textService.AddSubjectInClassResponse{
-		Response: "subject added successfully",
-	}, nil
+	if subjectId == nil {
+		return nil, fmt.Errorf("there is no such subject")
+	}
+
+	return subjectId, nil
 }
 
 func (th *TextHandler) RemoveSubjectFromClass(ctx context.Context, req *textService.RemoveSubjectFromClassRequest) (*textService.RemoveSubjectFromClassResponse, error) {
-	err := postgresRepo.RemoveSubjectFromClass(th.pg, req)
+	subjectId, err := postgresRepo.RemoveSubjectFromClass(th.pg, req)
 	if err != nil {
 		return nil, fmt.Errorf("updateClass: %v", err)
 	}
 
-	return &textService.RemoveSubjectFromClassResponse{
-		Response: "subject deleted successfully",
-	}, nil
+	return subjectId, nil
 }
 
 func (th *TextHandler) DeleteClass(ctx context.Context, req *textService.DeleteClassRequest) (*textService.DeleteClassResponse, error) {
@@ -87,12 +85,10 @@ func (th *TextHandler) DeleteClass(ctx context.Context, req *textService.DeleteC
 	// 	return nil, fmt.Errorf("deleteClass: %v", err)
 	// }
 
-	err := postgresRepo.DeleteClass(th.pg, req)
+	id, err := postgresRepo.DeleteClass(th.pg, req)
 	if err != nil {
 		return nil, fmt.Errorf("deleteClass: %v", err)
 	}
 
-	return &textService.DeleteClassResponse{
-		Response: "class deleted successfully",
-	}, nil
+	return id, nil
 }

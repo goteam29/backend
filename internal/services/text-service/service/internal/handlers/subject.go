@@ -4,9 +4,8 @@ import (
 	postgresRepo "api-repository/internal/services/text-service/service/internal/repository/postgres"
 	textService "api-repository/pkg/api/text-service"
 	"context"
+	"database/sql"
 	"fmt"
-
-	"github.com/google/uuid"
 )
 
 func (th *TextHandler) CreateSubject(ctx context.Context, req *textService.CreateSubjectRequest) (*textService.CreateSubjectResponse, error) {
@@ -15,26 +14,33 @@ func (th *TextHandler) CreateSubject(ctx context.Context, req *textService.Creat
 	// 	return nil, fmt.Errorf("createSubject: %v", err)
 	// }
 
-	id := uuid.New()
+	tx, err := th.pg.BeginTx(ctx, &sql.TxOptions{ReadOnly: true})
+	if err != nil {
+		return nil, fmt.Errorf("pgAddSubjectInClass: failed to begin transaction: %v", err)
+	}
+	defer tx.Rollback()
 
-	err := postgresRepo.InsertSubject(th.pg, req, id)
+	id, err := postgresRepo.InsertSubject(th.pg, req)
 	if err != nil {
 		return nil, fmt.Errorf("createSubject: %v", err)
 	}
 
 	updateRequest := &textService.AddSubjectInClassRequest{
-		ClassNumber: req.Subject.ClassNumber,
-		SubjectIds:  []string{id.String()},
+		Id:        req.ClassId,
+		SubjectId: id.Id,
 	}
 
-	err = postgresRepo.AddSubjectInClass(th.pg, updateRequest)
+	_, err = postgresRepo.AddSubjectInClass(ctx, th.pg, updateRequest)
 	if err != nil {
 		return nil, fmt.Errorf("createSubject: %v", err)
 	}
 
-	return &textService.CreateSubjectResponse{
-		Response: "Subject created successfully",
-	}, nil
+	err = tx.Commit()
+	if err != nil {
+		return nil, fmt.Errorf("pgAddSubjectInClass: failed to commit transaction: %v", err)
+	}
+
+	return id, nil
 }
 
 func (th *TextHandler) GetSubject(ctx context.Context, req *textService.GetSubjectRequest) (*textService.GetSubjectResponse, error) {
@@ -62,12 +68,12 @@ func (th *TextHandler) GetSubjects(ctx context.Context) (*textService.GetSubject
 	// }
 
 	// if len(Subjectes.Subjectes) == 0 {
-	Subjectes, err := postgresRepo.SelectSubjects(th.pg)
+	subjects, err := postgresRepo.SelectSubjects(th.pg)
 	if err != nil {
 		return nil, fmt.Errorf("getSubjectes: %v", err)
 	}
 
-	return Subjectes, nil
+	return subjects, nil
 	// }
 
 	// return Subjectes, nil
@@ -79,14 +85,12 @@ func (th *TextHandler) AddSectionInSubject(ctx context.Context, req *textService
 	// 	return nil, fmt.Errorf("updateSubject: %v", err)
 	// }
 
-	err := postgresRepo.AddSectionInSubject(th.pg, req)
+	sectionId, err := postgresRepo.AddSectionInSubject(th.pg, req)
 	if err != nil {
 		return nil, fmt.Errorf("updateSubject: %v", err)
 	}
 
-	return &textService.AddSectionInSubjectResponse{
-		Response: "section added in subject successfully",
-	}, nil
+	return sectionId, nil
 }
 
 func (th *TextHandler) RemoveSectionFromSubject(ctx context.Context, req *textService.RemoveSectionFromSubjectRequest) (*textService.RemoveSectionFromSubjectResponse, error) {
@@ -95,14 +99,12 @@ func (th *TextHandler) RemoveSectionFromSubject(ctx context.Context, req *textSe
 	// 	return nil, fmt.Errorf("updateSubject: %v", err)
 	// }
 
-	err := postgresRepo.RemoveSectionFromSubject(th.pg, req)
+	sectionId, err := postgresRepo.RemoveSectionFromSubject(th.pg, req)
 	if err != nil {
 		return nil, fmt.Errorf("updateSubject: %v", err)
 	}
 
-	return &textService.RemoveSectionFromSubjectResponse{
-		Response: "section removed from subject successfully",
-	}, nil
+	return sectionId, nil
 }
 
 func (th *TextHandler) DeleteSubject(ctx context.Context, req *textService.DeleteSubjectRequest) (*textService.DeleteSubjectResponse, error) {
@@ -111,12 +113,10 @@ func (th *TextHandler) DeleteSubject(ctx context.Context, req *textService.Delet
 	// 	return nil, fmt.Errorf("deleteSubject: %v", err)
 	// }
 
-	err := postgresRepo.DeleteSubject(th.pg, req)
+	id, err := postgresRepo.DeleteSubject(th.pg, req)
 	if err != nil {
 		return nil, fmt.Errorf("deleteSubject: %v", err)
 	}
 
-	return &textService.DeleteSubjectResponse{
-		Response: "subject deleted successfully",
-	}, nil
+	return id, nil
 }

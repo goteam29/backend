@@ -30,24 +30,25 @@ service Text{
 // Class
 
 message Class{
-  int32 class_number = 1;
-  repeated string subject_ids = 2;
+  string id = 1;
+  int32 number = 2;
+  repeated string subject_ids = 3;
 }
 
 // Create
 
 message CreateClassRequest{
-  Class class = 1;
+  int32 number = 1;
 }
 
 message CreateClassResponse{
-  string response = 1;
+  string id = 1;
 }
 
 // Read
 
 message GetClassRequest{
-  int32 class_number = 1;
+  string id = 1;
 }
 
 message GetClassResponse{
@@ -63,31 +64,31 @@ message GetClassesResponse{
 // Update
 
 message AddSubjectInClassRequest{
-  int32 class_number = 1;
-  repeated string subject_ids = 2;
+  string id = 1;
+  string subject_id = 2;
 }
 
 message AddSubjectInClassResponse{
-  string response = 1;
+  string subject_id = 1;
 }
 
 message RemoveSubjectFromClassRequest{
-  int32 class_number = 1;
+  string id = 1;
   string subject_id = 2;
 }
 
 message RemoveSubjectFromClassResponse{
-  string response = 1;
+  string subject_id = 1;
 }
 
 // Delete
 
 message DeleteClassRequest{
-  int32 number = 1;
+  string id = 1;
 }
 
 message DeleteClassResponse{
-  string response = 1;
+  string id = 1;
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------
@@ -95,49 +96,50 @@ message DeleteClassResponse{
 
 message Subject{
   string id = 1;
-  int32 classNumber = 2;
+  string class_id = 2;
   string name = 3;
   repeated string section_ids = 4;
 }
 
 message CreateSubjectRequest{
-    Subject subject = 1;
+  string class_id = 1;
+  string name = 2;
 }
 
 message CreateSubjectResponse{
-    string response = 1;
+  string id = 1;
 }
 
 message GetSubjectRequest{
-    string id = 1;
+  string id = 1;
 }
 
 message GetSubjectResponse{
-    Subject subject = 1;
+  Subject subject = 1;
 }
 
 message GetSubjectsRequest{}
 
 message GetSubjectsResponse{
-    repeated Subject subjects = 1;
+  repeated Subject subjects = 1;
 }
 
 message AddSectionInSubjectRequest{
-  string subject_id = 1;
-  repeated string section_ids = 2;
+  string id = 1;
+  string section_id = 2;
 }
 
 message AddSectionInSubjectResponse{
-  string response = 1;
+  string section_id = 1;
 }
 
 message RemoveSectionFromSubjectRequest{
-  string subject_id = 1;
+  string id = 1;
   string section_id = 2;
 }
 
 message RemoveSectionFromSubjectResponse{
-  string response = 1;
+  string section_id = 1;
 }
 
 message DeleteSubjectRequest{
@@ -145,7 +147,7 @@ message DeleteSubjectRequest{
 }
 
 message DeleteSubjectResponse{
-  string response = 1;
+  string id = 1;
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------
@@ -153,26 +155,57 @@ message DeleteSubjectResponse{
 
 message Section{
   string id = 1;
-  string subjectId = 2;
+  string subject_id = 2;
   string name = 3;
   string description = 4;
-  repeated string lessons_ids = 5;
 }
 
 message CreateSectionRequest{
-    Section section = 1;
+  Section section = 1;
 }
 
 message CreateSectionResponse{
-    string response = 1;
+  string response = 1;
 }
 
 message GetSectionRequest{
-    string id = 1;
+  string id = 1;
 }
 
 message GetSectionResponse{
-    Section section = 1;
+  Section section = 1;
+}
+
+message GetSectionsRequest{}
+
+message GetSectionsResponse{
+  repeated Section sections = 1;
+}
+
+message AddLessonsInSectionRequest{
+  string id = 1;
+  repeated string lesson_ids = 2;
+}
+
+message AddLessonsInSectionResponse{
+  string response = 1;
+}
+
+message RemoveLessonFromSectionRequest{
+  string id = 1;
+  string lesson_id = 2;
+}
+
+message RemoveLessonFromSectionResponse{
+  string response = 1;
+}
+
+message DeleteSectionRequest{
+  string id = 1;
+}
+
+message DeleteSectionResponse{
+  string response = 1;
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------
@@ -180,7 +213,7 @@ message GetSectionResponse{
 
 message Lesson{
   string id = 1;
-  string sectionId = 2;
+  string section_id = 2;
   string name = 3;
   string description = 4;
   repeated string video_ids = 5;
