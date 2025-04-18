@@ -9,7 +9,7 @@ import (
 )
 
 func InsertClass(db *sql.DB, req *textService.CreateClassRequest) error {
-	_, err := db.Exec("INSERT INTO classes (number, subject_ids) VALUES ($1, $2)", req.Class.Number, pq.Array(req.Class.SubjectIds))
+	_, err := db.Exec("INSERT INTO classes (number, subject_ids) VALUES ($1, $2)", req.Class.ClassNumber, pq.Array(req.Class.SubjectIds))
 	if err != nil {
 		return fmt.Errorf("pgInsertClass: failed to insert class into database: %v", err)
 	}
@@ -24,8 +24,8 @@ func SelectClass(db *sql.DB, req *textService.GetClassRequest) (*textService.Get
 		},
 	}
 
-	class := db.QueryRow("SELECT number, subject_ids FROM classes WHERE number = ($1)", req.Number)
-	err := class.Scan(&classResponse.Class.Number, pq.Array(&classResponse.Class.SubjectIds))
+	class := db.QueryRow("SELECT number, subject_ids FROM classes WHERE number = ($1)", req.ClassNumber)
+	err := class.Scan(&classResponse.Class.ClassNumber, pq.Array(&classResponse.Class.SubjectIds))
 	if err != nil {
 		return nil, fmt.Errorf("pgSelectClass: failed to scan class: %v", err)
 	}
@@ -46,7 +46,7 @@ func SelectClasses(db *sql.DB) (*textService.GetClassesResponse, error) {
 		class := &textService.Class{}
 		var subjectIds pq.StringArray
 
-		err := classes.Scan(&class.Number, &subjectIds)
+		err := classes.Scan(&class.ClassNumber, &subjectIds)
 		if err != nil {
 			return nil, fmt.Errorf("pgSelectClasses: failed to scan rows: %v", err)
 		}
@@ -66,17 +66,17 @@ func SelectClasses(db *sql.DB) (*textService.GetClassesResponse, error) {
 }
 
 func AddSubjectInClass(db *sql.DB, req *textService.AddSubjectInClassRequest) error {
-	if len(req.Class.SubjectIds) == 0 {
+	if len(req.SubjectIds) == 0 {
 		return fmt.Errorf("pgUpdateClass: no subject IDs provided")
 	}
 
-	if len(req.Class.SubjectIds) > 0 {
-		_, err := db.Exec("UPDATE classes SET subject_ids = subject_ids || $1 WHERE number = $2", pq.Array(req.Class.SubjectIds), req.Class.Number)
+	if len(req.SubjectIds) > 0 {
+		_, err := db.Exec("UPDATE classes SET subject_ids = subject_ids || $1 WHERE number = $2", pq.Array(req.SubjectIds), req.ClassNumber)
 		if err != nil {
 			return fmt.Errorf("pgUpdateClass: failed to add classes in database: %v", err)
 		}
 	} else {
-		_, err := db.Exec("UPDATE classes SET subject_ids = array_append(subject_ids, $1) WHERE number = $2", req.Class.SubjectIds[0], req.Class.Number)
+		_, err := db.Exec("UPDATE classes SET subject_ids = array_append(subject_ids, $1) WHERE number = $2", req.SubjectIds[0], req.ClassNumber)
 		if err != nil {
 			return fmt.Errorf("pgUpdateClass: failed to add class in database: %v", err)
 		}

@@ -28,7 +28,7 @@ service Text{
 // Class
 
 message Class{
-  int32 number = 1;
+  int32 class_number = 1;
   repeated string subject_ids = 2;
 }
 
@@ -45,7 +45,7 @@ message CreateClassResponse{
 // Read
 
 message GetClassRequest{
-  int32 number = 1;
+  int32 class_number = 1;
 }
 
 message GetClassResponse{
@@ -61,7 +61,8 @@ message GetClassesResponse{
 // Update
 
 message AddSubjectInClassRequest{
-  Class class = 1;
+  int32 class_number = 1;
+  repeated string subject_ids = 2;
 }
 
 message AddSubjectInClassResponse{

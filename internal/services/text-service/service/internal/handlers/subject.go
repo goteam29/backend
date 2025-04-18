@@ -23,10 +23,8 @@ func (th *TextHandler) CreateSubject(ctx context.Context, req *textService.Creat
 	}
 
 	updateRequest := &textService.AddSubjectInClassRequest{
-		Class: &textService.Class{
-			Number:     req.Subject.ClassNumber,
-			SubjectIds: []string{id.String()},
-		},
+		ClassNumber: req.Subject.ClassNumber,
+		SubjectIds:  []string{id.String()},
 	}
 
 	err = postgresRepo.AddSubjectInClass(th.pg, updateRequest)
