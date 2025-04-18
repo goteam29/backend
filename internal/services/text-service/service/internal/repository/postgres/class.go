@@ -65,10 +65,39 @@ func SelectClasses(db *sql.DB) (*textService.GetClassesResponse, error) {
 	}, nil
 }
 
-func UpdateClass(db *sql.DB, req *textService.UpdateClassRequest) error {
-	_, err := db.Exec("UPDATE classes SET subject_ids = array_append(subject_ids, $1) WHERE number = $2", req.Class.SubjectIds[0], req.Class.Number)
+func AddSubjectInClass(db *sql.DB, req *textService.AddSubjectInClassRequest) error {
+	if len(req.Class.SubjectIds) == 0 {
+		return fmt.Errorf("pgUpdateClass: no subject IDs provided")
+	}
+
+	if len(req.Class.SubjectIds) > 0 {
+		_, err := db.Exec("UPDATE classes SET subject_ids = subject_ids || $1 WHERE number = $2", pq.Array(req.Class.SubjectIds), req.Class.Number)
+		if err != nil {
+			return fmt.Errorf("pgUpdateClass: failed to add classes in database: %v", err)
+		}
+	} else {
+		_, err := db.Exec("UPDATE classes SET subject_ids = array_append(subject_ids, $1) WHERE number = $2", req.Class.SubjectIds[0], req.Class.Number)
+		if err != nil {
+			return fmt.Errorf("pgUpdateClass: failed to add class in database: %v", err)
+		}
+	}
+
+	return nil
+}
+
+func RemoveSubjectFromClass(db *sql.DB, req *textService.RemoveSubjectFromClassRequest) error {
+	_, err := db.Exec("UPDATE classes SET subject_ids = array_remove(subject_ids, $1) WHERE number = $2", req.SubjectId, req.ClassNumber)
 	if err != nil {
-		return fmt.Errorf("pgUpdateClass: failed to update class in database: %v", err)
+		return fmt.Errorf("pgUpdateClass: failed to remove class in database: %v", err)
+	}
+
+	return nil
+}
+
+func DeleteClass(db *sql.DB, req *textService.DeleteClassRequest) error {
+	_, err := db.Exec("DELETE FROM classes WHERE number = $1", req.Number)
+	if err != nil {
+		return fmt.Errorf("pgDeleteClass: failed to delete class in database: %v", err)
 	}
 
 	return nil

@@ -59,13 +59,40 @@ func (th *TextHandler) GetClasses(ctx context.Context) (*textService.GetClassesR
 	// return classes, nil
 }
 
-func (th *TextHandler) UpdateClass(ctx context.Context, req *textService.UpdateClassRequest) (*textService.UpdateClassResponse, error) {
-	err := postgresRepo.UpdateClass(th.pg, req)
+func (th *TextHandler) AddSubjectInClass(ctx context.Context, req *textService.AddSubjectInClassRequest) (*textService.AddSubjectInClassResponse, error) {
+	err := postgresRepo.AddSubjectInClass(th.pg, req)
 	if err != nil {
 		return nil, fmt.Errorf("updateClass: %v", err)
 	}
 
-	return &textService.UpdateClassResponse{
-		Response: "class updated successfully",
+	return &textService.AddSubjectInClassResponse{
+		Response: "subject added successfully",
+	}, nil
+}
+
+func (th *TextHandler) RemoveSubjectFromClass(ctx context.Context, req *textService.RemoveSubjectFromClassRequest) (*textService.RemoveSubjectFromClassResponse, error) {
+	err := postgresRepo.RemoveSubjectFromClass(th.pg, req)
+	if err != nil {
+		return nil, fmt.Errorf("updateClass: %v", err)
+	}
+
+	return &textService.RemoveSubjectFromClassResponse{
+		Response: "subject deleted successfully",
+	}, nil
+}
+
+func (th *TextHandler) DeleteClass(ctx context.Context, req *textService.DeleteClassRequest) (*textService.DeleteClassResponse, error) {
+	// err := redisRepo.DeleteClass(th.redis, req)
+	// if err != nil {
+	// 	return nil, fmt.Errorf("deleteClass: %v", err)
+	// }
+
+	err := postgresRepo.DeleteClass(th.pg, req)
+	if err != nil {
+		return nil, fmt.Errorf("deleteClass: %v", err)
+	}
+
+	return &textService.DeleteClassResponse{
+		Response: "class deleted successfully",
 	}, nil
 }
