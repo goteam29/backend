@@ -70,11 +70,39 @@ func SelectSubjects(db *sql.DB) (*textService.GetSubjectsResponse, error) {
 	}, nil
 }
 
-func UpdateSubject(db *sql.DB, req *textService.UpdateSubjectRequest) error {	
-	_, err := db.Exec("UPDATE subjects SET name = $1, class_number = $2, section_ids = array_append(section_ids, $3) WHERE id = $4",
-		req.Subject.Name, req.Subject.ClassNumber, req.Subject.SectionIds[0], req.Subject.Id)
+func AddSectionInSubject(db *sql.DB, req *textService.AddSectionInSubjectRequest) error {
+	if len(req.SectionIds) == 0 {
+		return fmt.Errorf("pgUpdateSubject: no section IDs provided")
+	}
+
+	if len(req.SectionIds) > 0 {
+		_, err := db.Exec("UPDATE subjects SET section_ids = section_ids || $1 WHERE id = $2", pq.Array(req.SectionIds), req.SubjectId)
+		if err != nil {
+			return fmt.Errorf("pgUpdateSubject: failed to add sections in subject: %v", err)
+		}
+	} else {
+		_, err := db.Exec("UPDATE subjects SET sections_ids = array_append(section_ids, $1) WHERE id = $2", req.SectionIds[0], req.SubjectId)
+		if err != nil {
+			return fmt.Errorf("pgUpdateSubject: failed to add section in subject: %v", err)
+		}
+	}
+
+	return nil
+}
+
+func RemoveSectionFromSubject(db *sql.DB, req *textService.RemoveSectionFromSubjectRequest) error {
+	_, err := db.Exec("UPDATE subjects SET section_ids = array_remove(section_ids, $1) WHERE id = $2", req.SectionId, req.SubjectId)
 	if err != nil {
-		return fmt.Errorf("pgUpdateSubject: failed to update subject in database: %v", err)
+		return fmt.Errorf("pgUpdateSubject: failed to remove section in subject: %v", err)
+	}
+
+	return nil
+}
+
+func DeleteSubject(db *sql.DB, req *textService.DeleteSubjectRequest) error {
+	_, err := db.Exec("DELETE FROM subjects WHERE id = $1", req.Id)
+	if err != nil {
+		return fmt.Errorf("pgDeleteSubject: failed to delete subject from database: %v", err)
 	}
 
 	return nil

@@ -73,18 +73,50 @@ func (th *TextHandler) GetSubjects(ctx context.Context) (*textService.GetSubject
 	// return Subjectes, nil
 }
 
-func (th *TextHandler) UpdateSubject(ctx context.Context, req *textService.UpdateSubjectRequest) (*textService.UpdateSubjectResponse, error) {
+func (th *TextHandler) AddSectionInSubject(ctx context.Context, req *textService.AddSectionInSubjectRequest) (*textService.AddSectionInSubjectResponse, error) {
 	// err := redisRepo.UpdateSubject(th.redis, req)
 	// if err != nil {
 	// 	return nil, fmt.Errorf("updateSubject: %v", err)
 	// }
 
-	err := postgresRepo.UpdateSubject(th.pg, req)
+	err := postgresRepo.AddSectionInSubject(th.pg, req)
 	if err != nil {
 		return nil, fmt.Errorf("updateSubject: %v", err)
 	}
 
-	return &textService.UpdateSubjectResponse{
-		Response: "Subject updated successfully",
+	return &textService.AddSectionInSubjectResponse{
+		Response: "section added in subject successfully",
+	}, nil
+}
+
+func (th *TextHandler) RemoveSectionFromSubject(ctx context.Context, req *textService.RemoveSectionFromSubjectRequest) (*textService.RemoveSectionFromSubjectResponse, error) {
+	// err := redisRepo.UpdateSubject(th.redis, req)
+	// if err != nil {
+	// 	return nil, fmt.Errorf("updateSubject: %v", err)
+	// }
+
+	err := postgresRepo.RemoveSectionFromSubject(th.pg, req)
+	if err != nil {
+		return nil, fmt.Errorf("updateSubject: %v", err)
+	}
+
+	return &textService.RemoveSectionFromSubjectResponse{
+		Response: "section removed from subject successfully",
+	}, nil
+}
+
+func (th *TextHandler) DeleteSubject(ctx context.Context, req *textService.DeleteSubjectRequest) (*textService.DeleteSubjectResponse, error) {
+	// err := redisRepo.DeleteSubject(th.redis, req)
+	// if err != nil {
+	// 	return nil, fmt.Errorf("deleteSubject: %v", err)
+	// }
+
+	err := postgresRepo.DeleteSubject(th.pg, req)
+	if err != nil {
+		return nil, fmt.Errorf("deleteSubject: %v", err)
+	}
+
+	return &textService.DeleteSubjectResponse{
+		Response: "subject deleted successfully",
 	}, nil
 }

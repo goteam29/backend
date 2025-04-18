@@ -4,7 +4,6 @@ package text_service;
 
 option go_package = "pkg/api/text-service";
 
-
 service Text{
   rpc CreateClass(CreateClassRequest) returns (CreateClassResponse);
   rpc GetClass(GetClassRequest) returns (GetClassResponse);
@@ -16,7 +15,9 @@ service Text{
   rpc CreateSubject(CreateSubjectRequest) returns (CreateSubjectResponse);
   rpc GetSubject(GetSubjectRequest) returns (GetSubjectResponse);
   rpc GetSubjects(GetSubjectsRequest) returns (GetSubjectsResponse);
-  rpc UpdateSubject(UpdateSubjectRequest) returns (UpdateSubjectResponse);
+  rpc AddSectionInSubject(AddSectionInSubjectRequest) returns (AddSectionInSubjectResponse);
+  rpc RemoveSectionFromSubject(RemoveSectionFromSubjectRequest) returns (RemoveSectionFromSubjectResponse);
+  rpc DeleteSubject(DeleteSubjectRequest) returns (DeleteSubjectResponse);
 
   rpc CreateSection(CreateSectionRequest) returns (CreateSectionResponse);
   rpc GetSection(GetSectionRequest) returns (GetSectionResponse);
@@ -25,6 +26,7 @@ service Text{
   rpc GetLesson(GetLessonRequest) returns (GetLessonResponse);
 }
 
+//---------------------------------------------------------------------------------------------------------------------------------
 // Class
 
 message Class{
@@ -88,6 +90,7 @@ message DeleteClassResponse{
   string response = 1;
 }
 
+//---------------------------------------------------------------------------------------------------------------------------------
 // Subject
 
 message Subject{
@@ -119,14 +122,33 @@ message GetSubjectsResponse{
     repeated Subject subjects = 1;
 }
 
-message UpdateSubjectRequest{
-  Subject subject = 1;
+message AddSectionInSubjectRequest{
+  string subject_id = 1;
+  repeated string section_ids = 2;
 }
 
-message UpdateSubjectResponse{
+message AddSectionInSubjectResponse{
   string response = 1;
 }
 
+message RemoveSectionFromSubjectRequest{
+  string subject_id = 1;
+  string section_id = 2;
+}
+
+message RemoveSectionFromSubjectResponse{
+  string response = 1;
+}
+
+message DeleteSubjectRequest{
+  string id = 1;
+}
+
+message DeleteSubjectResponse{
+  string response = 1;
+}
+
+//---------------------------------------------------------------------------------------------------------------------------------
 // Section
 
 message Section{
@@ -153,6 +175,7 @@ message GetSectionResponse{
     Section section = 1;
 }
 
+//---------------------------------------------------------------------------------------------------------------------------------
 // Lesson
 
 message Lesson{
