@@ -9,6 +9,8 @@ import (
 	"context"
 	"log"
 	"net"
+	"os"
+	"os/signal"
 	"strconv"
 
 	"google.golang.org/grpc"
@@ -16,6 +18,8 @@ import (
 
 func main() {
 	ctx := context.Background()
+	ctx, stop := signal.NotifyContext(ctx, os.Interrupt)
+	defer stop()
 
 	cfg, err := config.NewMainConfig()
 	if err != nil {
@@ -26,11 +30,11 @@ func main() {
 	if err != nil {
 		log.Fatalf("can't connect to postgres | err: %v", err)
 	}
-	
+
 	redisConn := redis.NewRedisConn(cfg.REDIS)
 	_, err = redisConn.Ping(ctx).Result()
 	if err != nil {
-		log.Fatalf("can't connect to redis | err: %v", err)
+		log.Printf("can't connect to redis | err: %v", err)
 	}
 
 	lis, err := net.Listen("tcp", ":"+strconv.Itoa(cfg.TextServicePort))
@@ -42,8 +46,14 @@ func main() {
 	svc := service.NewTextService(pgConn, redisConn)
 	textService.RegisterTextServer(server, svc)
 
-	log.Print("Text service started at port: ", cfg.TextServicePort)
-	if err := server.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
-	}
+	log.Print("text service started at port: ", cfg.TextServicePort)
+	go func() {
+		if err := server.Serve(lis); err != nil {
+			log.Fatalf("failed to serve: %v", err)
+		}
+	}()
+
+	<-ctx.Done()
+	server.GracefulStop()
+	log.Print("text service stopped")
 }
