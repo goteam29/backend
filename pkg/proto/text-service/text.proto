@@ -4,26 +4,96 @@ package text_service;
 
 option go_package = "pkg/api/text-service";
 
+import "google/api/annotations.proto";
+
 service Text{
-  rpc CreateClass(CreateClassRequest) returns (CreateClassResponse);
-  rpc GetClass(GetClassRequest) returns (GetClassResponse);
-  rpc GetClasses(GetClassesRequest) returns (GetClassesResponse);
-  rpc AddSubjectInClass(AddSubjectInClassRequest) returns (AddSubjectInClassResponse);
-  rpc RemoveSubjectFromClass(RemoveSubjectFromClassRequest) returns (RemoveSubjectFromClassResponse);
-  rpc DeleteClass(DeleteClassRequest) returns (DeleteClassResponse);
+  rpc CreateClass(CreateClassRequest) returns (CreateClassResponse){
+    option(google.api.http) = {
+        post: "/api/v0/class"
+    };
+  }
+  rpc GetClass(GetClassRequest) returns (GetClassResponse){
+    option (google.api.http) = {
+      get: "/api/v0/class"
+    };
+  };
+  rpc GetClasses(GetClassesRequest) returns (GetClassesResponse){
+    option (google.api.http) = {
+      get: "/api/v0/classes"
+    };
+  };
 
-  rpc CreateSubject(CreateSubjectRequest) returns (CreateSubjectResponse);
-  rpc GetSubject(GetSubjectRequest) returns (GetSubjectResponse);
-  rpc GetSubjects(GetSubjectsRequest) returns (GetSubjectsResponse);
-  rpc AddSectionInSubject(AddSectionInSubjectRequest) returns (AddSectionInSubjectResponse);
-  rpc RemoveSectionFromSubject(RemoveSectionFromSubjectRequest) returns (RemoveSectionFromSubjectResponse);
-  rpc DeleteSubject(DeleteSubjectRequest) returns (DeleteSubjectResponse);
 
-  rpc CreateSection(CreateSectionRequest) returns (CreateSectionResponse);
-  rpc GetSection(GetSectionRequest) returns (GetSectionResponse);
+  rpc AddSubjectInClass(AddSubjectInClassRequest) returns (AddSubjectInClassResponse){
+    option (google.api.http) = {
+      post: "/api/v0/class-subject"
+    };
+  };
 
-  rpc CreateLesson(CreateLessonRequest) returns (CreateLessonResponse);
-  rpc GetLesson(GetLessonRequest) returns (GetLessonResponse);
+  rpc RemoveSubjectFromClass(RemoveSubjectFromClassRequest) returns (RemoveSubjectFromClassResponse){
+    option (google.api.http) = {
+      delete: "/api/v0/class-subject"
+    };
+  };
+
+  rpc DeleteClass(DeleteClassRequest) returns (DeleteClassResponse){
+    option (google.api.http) = {
+        delete: "/api/v0/class"
+    };
+  };
+
+  rpc CreateSubject(CreateSubjectRequest) returns (CreateSubjectResponse){
+    option (google.api.http) = {
+      post: "/api/v0/class"
+    };
+  };
+  rpc GetSubject(GetSubjectRequest) returns (GetSubjectResponse){
+    option (google.api.http) = {
+      get: "/api/v0/subject"
+    };
+  };
+  rpc GetSubjects(GetSubjectsRequest) returns (GetSubjectsResponse){
+    option (google.api.http) = {
+      get: "/api/v0/subjects"
+    };
+  };
+  rpc AddSectionInSubject(AddSectionInSubjectRequest) returns (AddSectionInSubjectResponse){
+    option (google.api.http) = {
+      post: "/api/v0/section-subject"
+    };
+  };
+  rpc RemoveSectionFromSubject(RemoveSectionFromSubjectRequest) returns (RemoveSectionFromSubjectResponse){
+    option (google.api.http) = {
+      delete: "/api/v0/section-subject"
+    };
+  };
+  rpc DeleteSubject(DeleteSubjectRequest) returns (DeleteSubjectResponse){
+    option (google.api.http) = {
+      delete: "/api/v0/subject"
+    };
+  };
+
+  rpc CreateSection(CreateSectionRequest) returns (CreateSectionResponse){
+    option (google.api.http) = {
+      post: "/api/v0/section"
+    };
+  };
+  rpc GetSection(GetSectionRequest) returns (GetSectionResponse{
+    option (google.api.http) = {
+      get: "/api/v0/section"
+    };
+  };
+
+  rpc CreateLesson(CreateLessonRequest) returns (CreateLessonResponse){
+    option (google.api.http) = {
+      post: "/api/v0/lesson"
+    };
+  };
+  rpc GetLesson(GetLessonRequest) returns (GetLessonResponse){
+    option (google.api.http) = {
+      get: "/api/v0/lesson"
+    };
+  };
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------
