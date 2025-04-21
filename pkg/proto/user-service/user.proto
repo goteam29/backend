@@ -44,6 +44,7 @@ message LoginRequest{
 
 message LoginResponse{
     string uuid = 1; //use like in RegisterResponse
+    string token = 2;
 }
 
 //other messages

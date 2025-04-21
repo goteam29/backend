@@ -6,12 +6,11 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
+	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"time"
-
-	"github.com/lib/pq"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/metadata"
 )
 
 const expirationTime = 7 * 24 * time.Hour
@@ -31,64 +30,50 @@ func NewAuthHandler(_db *sql.DB, _secret string) *AuthHandler {
 	}
 }
 
-func (a *AuthHandler) Register(ctx context.Context, req *userservice.RegisterRequest) (*userservice.RegisterResponse, error) {
+func (ah *AuthHandler) Register(ctx context.Context, req *userservice.RegisterRequest) (*userservice.RegisterResponse, error) {
 	if req.Password != req.PasswordConfirm {
-		return nil, errors.New("passwords don't match")
+		return nil, status.Error(codes.InvalidArgument, "passwords do not match")
 	}
 
-	id, token, err := a.jwt.Generate(req)
+	passwordHash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
-		return nil, fmt.Errorf("failed to generate token: %w", err)
+		return nil, status.Errorf(codes.Internal, "can't hash password %v", err)
 	}
 
-	_, err = a.db.Exec("INSERT INTO users (id, username, email, token) VALUES($1, $2, $3, $4)",
-		id,
-		req.Username,
-		req.Email,
-		token,
-	)
+	id := uuid.New().String()
+
+	query := `INSERT into users (id, username, email, password_hash) values ($1, $2, $3, $4)`
+	_, err = ah.db.Exec(query, id, req.Username, req.Email, string(passwordHash))
 	if err != nil {
-		if pqErr, ok := err.(*pq.Error); ok {
-			if pqErr.Code == "23505" {
-				return nil, fmt.Errorf("user with this email already exists")
-			}
-		} else {
-			return nil, fmt.Errorf("failed to insert user into database: %w", err)
-		}
+		return nil, status.Errorf(codes.Internal, "can't insert user into bd | err: %v", err)
 	}
-
-	err = grpc.SendHeader(ctx, metadata.Pairs(
-		"Set-Cookie", "access_token="+token+"; HttpOnly; Path=/; SameSite=Lax",
-	))
-	if err != nil {
-		return nil, err
-	}
-
 	return &userservice.RegisterResponse{
-		Uuid: "user successfully registered",
+		Uuid: id,
 	}, nil
 }
 
 func (a *AuthHandler) Login(ctx context.Context, req *userservice.LoginRequest) (*userservice.LoginResponse, error) {
-	user := a.db.QueryRow("SELECT token FROM users WHERE email = $1;", req.Email)
-	var token string
+	row := a.db.QueryRow(`SELECT id, password_hash FROM users WHERE email = $1`, req.Email)
 
-	if err := user.Scan(&token); err != nil {
-		if err == sql.ErrNoRows {
-			return nil, fmt.Errorf("user with this email doesn't exist")
+	var id string
+	var passwordHash string
+	if err := row.Scan(&id, &passwordHash); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, status.Error(codes.NotFound, "user not found")
 		}
-		return nil, fmt.Errorf("login: failed to scan user: %w", err)
+		return nil, status.Errorf(codes.Internal, "failed to query user: %v", err)
 	}
 
-	claims, err := a.jwt.Verify(token)
+	if err := bcrypt.CompareHashAndPassword([]byte(passwordHash), []byte(req.Password)); err != nil {
+		return nil, status.Error(codes.Unauthenticated, "incorrect password")
+	}
+
+	token, err := a.jwt.Generate(id, req.Email)
 	if err != nil {
-		return nil, fmt.Errorf("failed to verify token: %w", err)
-	} else {
-		if claims.Password != req.Password {
-			return nil, fmt.Errorf("wrong password")
-		}
+		return nil, status.Errorf(codes.Internal, "failed to generate token: %v", err)
 	}
 
-	res := &userservice.LoginResponse{Uuid: "account logged in"}
-	return res, nil
+	return &userservice.LoginResponse{
+		Token: token,
+	}, nil
 }
