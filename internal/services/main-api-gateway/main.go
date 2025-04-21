@@ -1,14 +1,15 @@
 package main
 
 import (
-	fs "api-repository/pkg/api/file-service/file-service"
+	fs "api-repository/pkg/api/file-service"
 	"context"
 	"fmt"
+	"log"
+	"net/http"
+
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"log"
-	"net/http"
 )
 
 func main() {

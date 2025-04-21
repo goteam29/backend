@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package text_service;
 
-option go_package = "api-service/ts";
+option go_package = "pkg/api/text-service";
 
 import "google/api/annotations.proto";
 

@@ -1,8 +1,8 @@
 package service
 
 import (
-	"api-repository/internal/services/text-service/service/internal/handlers"
 	textService "api-repository/pkg/api/text-service"
+	"api-repository/internal/services/text-service/service/internal/handlers"
 	"context"
 	"database/sql"
 
