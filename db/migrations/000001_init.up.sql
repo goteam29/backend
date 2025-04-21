@@ -7,13 +7,12 @@ create table if not exists public.users(
 
 create table if not exists public.classes(
     id          uuid primary key,
-    number      integer not null
+    number      integer unique not null
 );
 
 create table if not exists public.subjects(
     id          uuid primary key,
-    name        text not null,
-    section_ids uuid[]
+    name        text unique not null
 );
 
 create table if not exists public.classes_subjects(
@@ -27,17 +26,44 @@ create table if not exists public.sections(
     subject_id  uuid not null references public.subjects(id) on delete cascade,
     name        text not null,
     description text not null,
-    lesson_ids  uuid[]
+    unique      (subject_id, name)
 );
 
 create table if not exists public.lessons(
+    id           uuid primary key,
+    section_id   uuid not null references public.sections(id) on delete cascade,
+    name         text not null,
+    description  text not null,
+    rating       int not null default 0,
+    unique       (section_id, name)
+);
+
+create table if not exists public.videos(
     id          uuid primary key,
-    section_id  uuid not null references public.sections(id) on delete cascade,
+    lesson_id   uuid not null references public.lessons(id) on delete cascade,
+    url         text not null
+);
+
+create table if not exists public.files(
+    id          uuid primary key,
+    lesson_id   uuid not null references public.lessons(id) on delete cascade,
+    url         text not null
+);
+
+create table if not exists public.exercises(
+    id          uuid primary key,
+    lesson_id   uuid not null references public.lessons(id) on delete cascade,
     name        text not null,
     description text not null,
-    videos      text[],
-    files       text[],
-    exercises   text[],
-    comments    text[],
-    rating      bigint not null default 0
+    answer      text not null,
+    unique      (lesson_id, name)
+);
+
+create table if not exists public.comments(
+    id          uuid primary key,
+    lesson_id   uuid not null references public.lessons(id) on delete cascade,
+    user_id     uuid not null references public.users(id) on delete cascade,
+    text        text not null,
+    created_at  timestamp not null default now(),
+    rating      int not null default 0
 );
