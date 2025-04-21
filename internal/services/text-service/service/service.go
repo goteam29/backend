@@ -85,9 +85,9 @@ func (ts *TextService) DeleteSubject(ctx context.Context, request *textService.D
 //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // Section
 
-// func (ts *TextService) CreateSection(ctx context.Context, request *textService.CreateSectionRequest) (*textService.CreateSectionResponse, error) {
-// 	return ts.textHandler.CreateSection(ctx, request)
-// }
+func (ts *TextService) CreateSection(ctx context.Context, request *textService.CreateSectionRequest) (*textService.CreateSectionResponse, error) {
+	return ts.textHandler.CreateSection(ctx, request)
+}
 
 // func (ts *TextService) GetSection(ctx context.Context, request *textService.GetSectionRequest) (*textService.GetSectionResponse, error) {
 // 	return ts.textHandler.GetSection(ctx, request)

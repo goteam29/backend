@@ -158,14 +158,17 @@ message Section{
   string subject_id = 2;
   string name = 3;
   string description = 4;
+  repeated string lesson_ids = 5;
 }
 
 message CreateSectionRequest{
-  Section section = 1;
+  string subject_id = 1;
+  string name = 2;
+  string description = 3;
 }
 
 message CreateSectionResponse{
-  string response = 1;
+  string id = 1;
 }
 
 message GetSectionRequest{
@@ -184,11 +187,11 @@ message GetSectionsResponse{
 
 message AddLessonsInSectionRequest{
   string id = 1;
-  repeated string lesson_ids = 2;
+  string lesson_id = 2;
 }
 
 message AddLessonsInSectionResponse{
-  string response = 1;
+  string lesson_id = 1;
 }
 
 message RemoveLessonFromSectionRequest{
@@ -197,7 +200,7 @@ message RemoveLessonFromSectionRequest{
 }
 
 message RemoveLessonFromSectionResponse{
-  string response = 1;
+  string lesson_id = 1;
 }
 
 message DeleteSectionRequest{
@@ -205,7 +208,7 @@ message DeleteSectionRequest{
 }
 
 message DeleteSectionResponse{
-  string response = 1;
+  string id = 1;
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------
