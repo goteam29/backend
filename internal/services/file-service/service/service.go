@@ -11,7 +11,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	pb "api-repository/api-service/fs"
+	pb "api-repository/pkg/api/file-service"
 )
 
 type FileService struct {

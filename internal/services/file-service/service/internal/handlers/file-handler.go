@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	fileservice "api-repository/api-service/fs"
+	fileservice "api-repository/pkg/api/file-service"
 	"api-repository/pkg/db/minio"
 	"context"
 )
