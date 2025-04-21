@@ -11,6 +11,6 @@ build:
 	go mod download
 	go build -o service ./cmd/main.go
 
-run: generate api build
+run: generate_api build
 
 
