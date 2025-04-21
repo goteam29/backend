@@ -78,7 +78,7 @@ service Text{
       post: "/api/v0/section"
     };
   };
-  rpc GetSection(GetSectionRequest) returns (GetSectionResponse{
+  rpc GetSection(GetSectionRequest) returns (GetSectionResponse){
     option (google.api.http) = {
       get: "/api/v0/section"
     };
