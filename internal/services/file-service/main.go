@@ -4,6 +4,9 @@ import (
 	"api-repository/internal/config"
 	"api-repository/internal/services/file-service/service"
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 func main() {
@@ -17,8 +20,15 @@ func main() {
 		log.Fatalf("Service initialization failed: %v", err)
 	}
 
-	log.Printf("Starting gRPC server on port %d", cfg.UserServicePort)
-	if err := fileService.Start(cfg.UserServicePort); err != nil {
-		log.Fatalf("Server error: %v", err)
+	if err := fileService.Start(cfg.FileServicePort); err != nil {
+		log.Fatalf("Failed to start service: %v", err)
 	}
+	defer fileService.Stop()
+
+	log.Printf("Service started on port %d", cfg.FileServicePort)
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	log.Println("Shutting down server...")
 }

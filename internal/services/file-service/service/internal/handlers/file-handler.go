@@ -16,14 +16,17 @@ func NewFileHandler(_minio *minio.Client) *FileHandler {
 	}
 }
 
-func (fh *FileHandler) GetFile(ctx context.Context, req *fileservice.GetFileRequest,
-) (*fileservice.GetFileResponse, error) {
-	data, err := fh.minio.GetFile(ctx, req.BucketName, req.ObjectKey)
+func (fh *FileHandler) GetFile(ctx context.Context, req *fileservice.GetFileRequest) (*fileservice.GetFileResponse, error) {
+	obj, err := fh.minio.GetFileWithMeta(ctx, req.BucketName, req.ObjectKey)
 	if err != nil {
 		return nil, err
 	}
+
 	return &fileservice.GetFileResponse{
-		Content:  data,
-		Filename: req.ObjectKey,
+		Content:      obj.Content,
+		Filename:     req.ObjectKey,
+		ContentType:  obj.ContentType,
+		Size:         obj.Size,
+		LastModified: obj.LastModified,
 	}, nil
 }

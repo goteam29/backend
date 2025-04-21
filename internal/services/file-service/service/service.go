@@ -5,6 +5,7 @@ import (
 	"api-repository/internal/services/file-service/service/internal/handlers"
 	"api-repository/pkg/db/minio"
 	"context"
+	"log"
 	"net"
 	"strconv"
 
@@ -33,11 +34,11 @@ func New(cfg *config.MainConfig) (*FileService, error) {
 	if err != nil {
 		return nil, err
 	}
+	fileHandler := handlers.NewFileHandler(minioClient)
 
 	grpcServer := grpc.NewServer()
 	pb.RegisterFileServer(grpcServer, &fileServer{
-		minioClient: minioClient,
-		fileHandler: handlers.NewFileHandler(minioClient),
+		fileHandler: fileHandler,
 	})
 
 	return &FileService{
@@ -52,7 +53,10 @@ func (s *FileService) Start(port int) error {
 		return err
 	}
 
-	return s.grpcServer.Serve(lis)
+	if err := s.grpcServer.Serve(lis); err != nil {
+		log.Printf("gRPC server error: %v", err)
+	}
+	return nil
 }
 
 func (s *FileService) Stop() {

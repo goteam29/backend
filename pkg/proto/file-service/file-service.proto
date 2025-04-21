@@ -1,17 +1,22 @@
 syntax = "proto3";
-
 package file_service;
 
-option go_package = "pkg/api/file-service";
+option go_package = "api-service/fs";
+
+import "google/api/annotations.proto";
 
 
 service File{
-  rpc GetFile(GetFileRequest) returns (GetFileResponse); // Клиент загружает файл по частям
+  rpc GetFile(GetFileRequest) returns (GetFileResponse){
+    option (google.api.http) = {
+      get: "/api/v0/file"
+    };
+  };
 }
 
 message GetFileRequest {
-  string bucket_name = 1;  // Было bucket
-  string object_key = 2;   // Было object_key
+  string bucket_name = 1;
+  string object_key = 2;
 }
 
 message GetFileResponse {

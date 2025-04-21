@@ -1,7 +1,7 @@
 syntax="proto3";
 
-import "pkg/proto/google/api/annotations.proto";
-option go_package="pkg/api/user-service";
+import "google/api/annotations.proto";
+option go_package="api-service/us";
 
 package user_service;
 
