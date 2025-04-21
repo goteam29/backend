@@ -1,6 +1,8 @@
 package models
 
+import "github.com/google/uuid"
+
 type Class struct {
-	Number  int
-	Classes []Subject
+	Number   int
+	Subjects []uuid.UUID
 }

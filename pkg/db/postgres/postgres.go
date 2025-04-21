@@ -46,7 +46,7 @@ func NewPostgres(c PgConfig) (*sql.DB, error) {
 
 	if err := m.Up(); err != nil {
 		if err == migrate.ErrNoChange {
-			log.Println("no new migrations")
+
 		} else {
 			return nil, fmt.Errorf("can't migrate database | err: %v", err)
 		}
