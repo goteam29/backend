@@ -9,13 +9,22 @@ import (
 	"github.com/lib/pq"
 )
 
-func InsertSection(db *sql.Tx, req *textService.CreateSectionRequest, id uuid.UUID) error {
-	_, err := db.Exec("INSERT INTO sections (id, subject_id, name, description) VALUES ($1, $2, $3, $4)", id, req.SubjectId, req.Name, req.Description)
+func InsertSection(db *sql.Tx, req *textService.CreateSectionRequest) (*textService.CreateSectionResponse, error) {
+	id := uuid.New()
+
+	_, err := db.Exec("INSERT INTO sections (id, subject_id, name, description) VALUES ($1, $2, $3, $4)",
+		id,
+		req.SubjectId,
+		req.Name,
+		req.Description,
+	)
 	if err != nil {
-		return fmt.Errorf("pgInsertSection: failed to insert section into database: %v", err)
+		return nil, fmt.Errorf("pgInsertSection: failed to insert section into database: %v", err)
 	}
 
-	return nil
+	return &textService.CreateSectionResponse{
+		Id: id.String(),
+	},nil
 }
 
 func SelectSection(db *sql.DB, req *textService.GetSectionRequest) (*textService.GetSectionResponse, error) {

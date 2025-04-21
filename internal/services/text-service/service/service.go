@@ -119,3 +119,47 @@ func (ts *TextService) CreateLesson(ctx context.Context, request *textService.Cr
 func (ts *TextService) GetLesson(ctx context.Context, request *textService.GetLessonRequest) (*textService.GetLessonResponse, error) {
 	return ts.textHandler.GetLesson(ctx, request)
 }
+
+func (ts *TextService) GetLessons(ctx context.Context, request *textService.GetLessonsRequest) (*textService.GetLessonsResponse, error) {
+	return ts.textHandler.GetLessons(ctx, request)
+}
+
+func (ts *TextService) AddVideoInLesson(ctx context.Context, request *textService.AddVideoInLessonRequest) (*textService.AddVideoInLessonResponse, error) {
+	return ts.textHandler.AddVideoInLesson(ctx, request)
+}
+
+func (ts *TextService) RemoveVideoFromLesson(ctx context.Context, request *textService.RemoveVideoFromLessonRequest) (*textService.RemoveVideoFromLessonResponse, error) {
+	return ts.textHandler.RemoveVideoFromLesson(ctx, request)
+}
+
+func (ts *TextService) AddFileInLesson(ctx context.Context, request *textService.AddFileInLessonRequest) (*textService.AddFileInLessonResponse, error) {
+	return ts.textHandler.AddFileInLesson(ctx, request)
+}
+
+func (ts *TextService) RemoveFileFromLesson(ctx context.Context, request *textService.RemoveFileFromLessonRequest) (*textService.RemoveFileFromLessonResponse, error) {
+	return ts.textHandler.RemoveFileFromLesson(ctx, request)
+}
+
+func (ts *TextService) AddExerciseInLesson(ctx context.Context, request *textService.AddExerciseInLessonRequest) (*textService.AddExerciseInLessonResponse, error) {
+	return ts.textHandler.AddExerciseInLesson(ctx, request)
+}
+
+func (ts *TextService) RemoveExerciseFromLesson(ctx context.Context, request *textService.RemoveExerciseFromLessonRequest) (*textService.RemoveExerciseFromLessonResponse, error) {
+	return ts.textHandler.RemoveExerciseFromLesson(ctx, request)
+}
+
+func (ts *TextService) AddCommentInLesson(ctx context.Context, request *textService.AddCommentInLessonRequest) (*textService.AddCommentInLessonResponse, error) {
+	return ts.textHandler.AddCommentInLesson(ctx, request)
+}
+
+func (ts *TextService) RemoveCommentFromLesson(ctx context.Context, request *textService.RemoveCommentFromLessonRequest) (*textService.RemoveCommentFromLessonResponse, error) {
+	return ts.textHandler.RemoveCommentFromLesson(ctx, request)
+}
+
+func (ts *TextService) IncreaseRating(ctx context.Context, request *textService.IncreaseRatingRequest) (*textService.IncreaseRatingResponse, error) {
+	return ts.textHandler.IncreaseRating(ctx, request)
+}
+
+func (ts *TextService) DeleteLesson(ctx context.Context, request *textService.DeleteLessonRequest) (*textService.DeleteLessonResponse, error) {
+	return ts.textHandler.DeleteLesson(ctx, request)
+}

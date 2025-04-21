@@ -8,11 +8,13 @@ import "google/api/annotations.proto";
 
 service Text{
   // Class
+
   rpc CreateClass(CreateClassRequest) returns (CreateClassResponse){
     option(google.api.http) = {
         post: "/api/v0/class"
     };
   }
+
   rpc GetClass(GetClassRequest) returns (GetClassResponse){
     option (google.api.http) = {
       get: "/api/v0/class"
@@ -23,6 +25,7 @@ service Text{
       get: "/api/v0/classes"
     };
   };
+
   rpc AddSubjectInClass(AddSubjectInClassRequest) returns (AddSubjectInClassResponse){
     option (google.api.http) = {
       post: "/api/v0/class-subject"
@@ -33,6 +36,7 @@ service Text{
       delete: "/api/v0/class-subject"
     };
   };
+
   rpc DeleteClass(DeleteClassRequest) returns (DeleteClassResponse){
     option (google.api.http) = {
         delete: "/api/v0/class"
@@ -40,11 +44,13 @@ service Text{
   };
 
   // Subject
+
   rpc CreateSubject(CreateSubjectRequest) returns (CreateSubjectResponse){
     option (google.api.http) = {
       post: "/api/v0/subject"
     };
   };
+
   rpc GetSubject(GetSubjectRequest) returns (GetSubjectResponse){
     option (google.api.http) = {
       get: "/api/v0/subject"
@@ -55,6 +61,7 @@ service Text{
       get: "/api/v0/subjects"
     };
   };
+
   rpc AddSectionInSubject(AddSectionInSubjectRequest) returns (AddSectionInSubjectResponse){
     option (google.api.http) = {
       post: "/api/v0/section-subject"
@@ -65,6 +72,7 @@ service Text{
       delete: "/api/v0/section-subject"
     };
   };
+
   rpc DeleteSubject(DeleteSubjectRequest) returns (DeleteSubjectResponse){
     option (google.api.http) = {
       delete: "/api/v0/subject"
@@ -72,11 +80,13 @@ service Text{
   };
 
   // Section
+
   rpc CreateSection(CreateSectionRequest) returns (CreateSectionResponse){
     option (google.api.http) = {
       post: "/api/v0/section"
     };
   };
+
   rpc GetSection(GetSectionRequest) returns (GetSectionResponse){
     option (google.api.http) = {
       get: "/api/v0/section"
@@ -87,6 +97,7 @@ service Text{
       get: "/api/v0/sections"
     };
   };
+
   rpc AddLessonInSection(AddLessonInSectionRequest) returns (AddLessonInSectionResponse){
     option (google.api.http) = {
       post: "/api/v0/section-lesson"
@@ -97,6 +108,7 @@ service Text{
       delete: "/api/v0/section-lesson"
     };
   };
+
   rpc DeleteSection(DeleteSectionRequest) returns (DeleteSectionResponse){
     option (google.api.http) = {
       delete: "/api/v0/section"
@@ -104,19 +116,87 @@ service Text{
   };
 
   // Lesson
+
   rpc CreateLesson(CreateLessonRequest) returns (CreateLessonResponse){
     option (google.api.http) = {
       post: "/api/v0/lesson"
     };
   };
+
   rpc GetLesson(GetLessonRequest) returns (GetLessonResponse){
     option (google.api.http) = {
       get: "/api/v0/lesson"
     };
   };
+  rpc GetLessons(GetLessonsRequest) returns (GetLessonsResponse){
+    option (google.api.http) = {
+      get: "/api/v0/lessons"
+    };
+  };
+
+  rpc AddVideoInLesson(AddVideoInLessonRequest) returns (AddVideoInLessonResponse){
+    option (google.api.http) = {
+      post: "/api/v0/lesson-video"
+    };
+  };
+  rpc RemoveVideoFromLesson(RemoveVideoFromLessonRequest) returns (RemoveVideoFromLessonResponse){
+    option (google.api.http) = {
+      delete: "/api/v0/lesson-video"
+    };
+  };
+
+  rpc AddFileInLesson(AddFileInLessonRequest) returns (AddFileInLessonResponse){
+    option (google.api.http) = {
+      post: "/api/v0/lesson-file"
+    };
+  };
+  rpc RemoveFileFromLesson(RemoveFileFromLessonRequest) returns (RemoveFileFromLessonResponse){
+    option (google.api.http) = {
+      delete: "/api/v0/lesson-file"
+    };
+  };
+
+  rpc AddExerciseInLesson(AddExerciseInLessonRequest) returns (AddExerciseInLessonResponse){
+    option (google.api.http) = {
+      post: "/api/v0/lesson-exercise"
+    };
+  };
+  rpc RemoveExerciseFromLesson(RemoveExerciseFromLessonRequest) returns (RemoveExerciseFromLessonResponse){
+    option (google.api.http) = {
+      delete: "/api/v0/lesson-exercise"
+    };
+  };
+
+  rpc AddCommentInLesson(AddCommentInLessonRequest) returns (AddCommentInLessonResponse){
+    option (google.api.http) = {
+      post: "/api/v0/lesson-comment"
+    };
+  };
+  rpc RemoveCommentFromLesson(RemoveCommentFromLessonRequest) returns (RemoveCommentFromLessonResponse){
+    option (google.api.http) = {
+      delete: "/api/v0/lesson-comment"
+    };
+  };
+
+  rpc IncreaseRating(IncreaseRatingRequest) returns (IncreaseRatingResponse){
+    option (google.api.http) = {
+      post: "/api/v0/lesson-rating"
+    };
+  };
+  rpc DecreaseRating(DecreaseRatingRequest) returns (DecreaseRatingResponse){
+    option (google.api.http) = {
+      delete: "/api/v0/lesson-rating"
+    };
+  };
+
+  rpc DeleteLesson(DeleteLessonRequest) returns (DeleteLessonResponse){
+    option (google.api.http) = {
+      delete: "/api/v0/lesson"
+    };
+  };
 }
 
-//---------------------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------
 // Class
 
 message Class{
@@ -126,38 +206,31 @@ message Class{
 }
 
 // Create
-
 message CreateClassRequest{
   int32 number = 1;
 }
-
 message CreateClassResponse{
   string id = 1;
 }
 
 // Read
-
 message GetClassRequest{
   string id = 1;
 }
-
 message GetClassResponse{
   Class class = 1;
 }
 
 message GetClassesRequest{}
-
 message GetClassesResponse{
   repeated Class classes = 1;
 }
 
 // Update
-
 message AddSubjectInClassRequest{
   string id = 1;
   string subject_id = 2;
 }
-
 message AddSubjectInClassResponse{
   string subject_id = 1;
 }
@@ -166,22 +239,19 @@ message RemoveSubjectFromClassRequest{
   string id = 1;
   string subject_id = 2;
 }
-
 message RemoveSubjectFromClassResponse{
   string subject_id = 1;
 }
 
 // Delete
-
 message DeleteClassRequest{
   string id = 1;
 }
-
 message DeleteClassResponse{
   string id = 1;
 }
 
-//---------------------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------
 // Subject
 
 message Subject{
@@ -191,34 +261,33 @@ message Subject{
   repeated string section_ids = 4;
 }
 
+// Create
 message CreateSubjectRequest{
   string class_id = 1;
   string name = 2;
 }
-
 message CreateSubjectResponse{
   string id = 1;
 }
 
+// Read
 message GetSubjectRequest{
   string id = 1;
 }
-
 message GetSubjectResponse{
   Subject subject = 1;
 }
 
 message GetSubjectsRequest{}
-
 message GetSubjectsResponse{
   repeated Subject subjects = 1;
 }
 
+// Update
 message AddSectionInSubjectRequest{
   string id = 1;
   string section_id = 2;
 }
-
 message AddSectionInSubjectResponse{
   string section_id = 1;
 }
@@ -227,22 +296,20 @@ message RemoveSectionFromSubjectRequest{
   string id = 1;
   string section_id = 2;
 }
-
 message RemoveSectionFromSubjectResponse{
   string section_id = 1;
 }
 
+// Delete
 message DeleteSubjectRequest{
   string id = 1;
 }
-
 message DeleteSubjectResponse{
   string id = 1;
 }
 
-//---------------------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------
 // Section
-
 message Section{
   string id = 1;
   string subject_id = 2;
@@ -301,7 +368,7 @@ message DeleteSectionResponse{
   string id = 1;
 }
 
-//---------------------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------
 // Lesson
 
 message Lesson{
@@ -317,17 +384,107 @@ message Lesson{
 }
 
 message CreateLessonRequest{
-    Lesson lesson = 1;
+  string section_id = 1;
+  string name = 2;
+  string description = 3;
 }
-
 message CreateLessonResponse{
-    string response = 1;
+  string id = 1;
 }
 
 message GetLessonRequest{
-    string id = 1;
+  string id = 1;
+}
+message GetLessonResponse{
+  Lesson lesson = 1;
 }
 
-message GetLessonResponse{
-    Lesson lesson = 1;
+message GetLessonsRequest{}
+message GetLessonsResponse{
+  repeated Lesson lessons = 1;
+}
+
+message AddVideoInLessonRequest{
+  string id = 1;
+  string video_id = 2;
+}
+message AddVideoInLessonResponse{
+  string video_id = 1;
+}
+
+message RemoveVideoFromLessonRequest{
+  string id = 1;
+  string video_id = 2;
+}
+message RemoveVideoFromLessonResponse{
+  string video_id = 1;
+}
+
+message AddFileInLessonRequest{
+  string id = 1;
+  string file_id = 2;
+}
+message AddFileInLessonResponse{
+  string file_id = 1;
+}
+
+message RemoveFileFromLessonRequest{
+  string id = 1;
+  string file_id = 2;
+}
+message RemoveFileFromLessonResponse{
+  string file_id = 1;
+}
+
+message AddExerciseInLessonRequest{
+  string id = 1;
+  string exercise_id = 2;
+}
+message AddExerciseInLessonResponse{
+  string exercise_id = 1;
+}
+
+message RemoveExerciseFromLessonRequest{
+  string id = 1;
+  string exercise_id = 2;
+}
+message RemoveExerciseFromLessonResponse{
+  string exercise_id = 1;
+}
+
+message AddCommentInLessonRequest{
+  string id = 1;
+  string comment_id = 2;
+}
+message AddCommentInLessonResponse{
+  string comment_id = 1;
+}
+
+message RemoveCommentFromLessonRequest{
+  string id = 1;
+  string comment_id = 2;
+}
+message RemoveCommentFromLessonResponse{
+  string comment_id = 1;
+}
+
+message IncreaseRatingRequest{
+  string id = 1;
+}
+message IncreaseRatingResponse{
+  string id = 1;
+}
+
+message DecreaseRatingRequest{
+  string id = 1;
+}
+message DecreaseRatingResponse{
+  string id = 1;
+}
+
+message DeleteLessonRequest{
+    string id = 1;
+}
+message DeleteLessonResponse{
+    string id = 1;
 }

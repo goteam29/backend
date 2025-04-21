@@ -37,7 +37,7 @@ func (th *TextHandler) CreateSubject(ctx context.Context, req *textService.Creat
 
 	err = tx.Commit()
 	if err != nil {
-		return nil, fmt.Errorf("pgAddSubjectInClass: failed to commit transaction: %v", err)
+		return nil, fmt.Errorf("createSubject: failed to commit transaction: %v", err)
 	}
 
 	return id, nil

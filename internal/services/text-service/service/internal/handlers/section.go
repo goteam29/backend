@@ -6,8 +6,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-
-	uuid "github.com/google/uuid"
 )
 
 func (th *TextHandler) CreateSection(ctx context.Context, req *textService.CreateSectionRequest) (*textService.CreateSectionResponse, error) {
@@ -16,37 +14,33 @@ func (th *TextHandler) CreateSection(ctx context.Context, req *textService.Creat
 	// 	return nil, fmt.Errorf("insertSection: %v", err)
 	// }
 
-	id := uuid.New()
-
 	tx, err := th.pg.BeginTx(ctx, &sql.TxOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("pgAddSubjectInClass: failed to begin transaction: %v", err)
 	}
 	defer tx.Rollback()
 
-	err = postgresRepo.InsertSection(tx, req, id)
+	id, err := postgresRepo.InsertSection(tx, req)
 	if err != nil {
 		return nil, fmt.Errorf("insertSection: %v", err)
 	}
 
 	updateRequest := &textService.AddSectionInSubjectRequest{
 		Id:        req.SubjectId,
-		SectionId: id.String(),
+		SectionId: id.Id,
 	}
 
 	_, err = postgresRepo.AddSectionInSubject(ctx, tx, updateRequest)
 	if err != nil {
-		return nil, fmt.Errorf("pgAddSectionInSubject: failed to add section in subject: %v", err)
+		return nil, fmt.Errorf("createSection: failed to add section in subject: %v", err)
 	}
 
 	err = tx.Commit()
 	if err != nil {
-		return nil, fmt.Errorf("pgAddSubjectInClass: failed to commit transaction: %v", err)
+		return nil, fmt.Errorf("createSection: failed to commit transaction: %v", err)
 	}
 
-	return &textService.CreateSectionResponse{
-		Id: id.String(),
-	}, nil
+	return id, nil
 }
 
 func (th *TextHandler) GetSection(ctx context.Context, req *textService.GetSectionRequest) (*textService.GetSectionResponse, error) {
