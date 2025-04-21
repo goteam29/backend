@@ -12,7 +12,7 @@ type TextHandler struct {
 
 func NewTextHandler(pgConn *sql.DB, redisConn *redis.Client) *TextHandler {
 	return &TextHandler{
-		pg: pgConn,
+		pg:    pgConn,
 		redis: redisConn,
 	}
 }

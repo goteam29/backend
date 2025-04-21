@@ -8,8 +8,8 @@ import (
 	"github.com/google/uuid"
 )
 
-func InsertSection(db *sql.DB, req *textService.CreateSectionRequest, id uuid.UUID) error {
-	_, err := db.Exec("INSERT INTO sections (id, subject_id, name, description) VALUES ($1, $2, $3, $4)", id, req.Section.SubjectId, req.Section.Name, req.Section.Description)
+func InsertSection(db *sql.Tx, req *textService.CreateSectionRequest, id uuid.UUID) error {
+	_, err := db.Exec("INSERT INTO sections (id, subject_id, name, description) VALUES ($1, $2, $3, $4)", id, req.SubjectId, req.Name, req.Description)
 	if err != nil {
 		return fmt.Errorf("pgInsertSection: failed to insert section into database: %v", err)
 	}
