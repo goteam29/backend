@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package text_service;
 
-option go_package = "pkg/api/text-service";
+option go_package = "api-service/ts";
 
 import "google/api/annotations.proto";
 
@@ -44,7 +44,7 @@ service Text{
 
   rpc CreateSubject(CreateSubjectRequest) returns (CreateSubjectResponse){
     option (google.api.http) = {
-      post: "/api/v0/class"
+      post: "/api/v0/subject"
     };
   };
   rpc GetSubject(GetSubjectRequest) returns (GetSubjectResponse){
