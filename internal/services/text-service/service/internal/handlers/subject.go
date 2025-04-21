@@ -20,7 +20,7 @@ func (th *TextHandler) CreateSubject(ctx context.Context, req *textService.Creat
 	}
 	defer tx.Rollback()
 
-	id, err := postgresRepo.InsertSubject(th.pg, req)
+	id, err := postgresRepo.InsertSubject(ctx, th.pg, req)
 	if err != nil {
 		return nil, fmt.Errorf("createSubject: %v", err)
 	}
@@ -50,7 +50,7 @@ func (th *TextHandler) GetSubject(ctx context.Context, req *textService.GetSubje
 	// }
 
 	// if Subject == nil {
-	subject, err := postgresRepo.SelectSubject(th.pg, req)
+	subject, err := postgresRepo.SelectSubject(ctx, th.pg, req)
 	if err != nil {
 		return nil, fmt.Errorf("getSubject: %v", err)
 	}
@@ -68,7 +68,7 @@ func (th *TextHandler) GetSubjects(ctx context.Context) (*textService.GetSubject
 	// }
 
 	// if len(Subjectes.Subjectes) == 0 {
-	subjects, err := postgresRepo.SelectSubjects(th.pg)
+	subjects, err := postgresRepo.SelectSubjects(ctx, th.pg)
 	if err != nil {
 		return nil, fmt.Errorf("getSubjectes: %v", err)
 	}
@@ -85,7 +85,9 @@ func (th *TextHandler) AddSectionInSubject(ctx context.Context, req *textService
 	// 	return nil, fmt.Errorf("updateSubject: %v", err)
 	// }
 
-	sectionId, err := postgresRepo.AddSectionInSubject(th.pg, req)
+	tx := &sql.Tx{}
+
+	sectionId, err := postgresRepo.AddSectionInSubject(ctx, tx, req)
 	if err != nil {
 		return nil, fmt.Errorf("updateSubject: %v", err)
 	}
@@ -99,7 +101,7 @@ func (th *TextHandler) RemoveSectionFromSubject(ctx context.Context, req *textSe
 	// 	return nil, fmt.Errorf("updateSubject: %v", err)
 	// }
 
-	sectionId, err := postgresRepo.RemoveSectionFromSubject(th.pg, req)
+	sectionId, err := postgresRepo.RemoveSectionFromSubject(ctx, th.pg, req)
 	if err != nil {
 		return nil, fmt.Errorf("updateSubject: %v", err)
 	}
@@ -113,7 +115,7 @@ func (th *TextHandler) DeleteSubject(ctx context.Context, req *textService.Delet
 	// 	return nil, fmt.Errorf("deleteSubject: %v", err)
 	// }
 
-	id, err := postgresRepo.DeleteSubject(th.pg, req)
+	id, err := postgresRepo.DeleteSubject(ctx, th.pg, req)
 	if err != nil {
 		return nil, fmt.Errorf("deleteSubject: %v", err)
 	}

@@ -2,6 +2,7 @@ package repository
 
 import (
 	textService "api-repository/pkg/api/text-service"
+	"context"
 	"database/sql"
 	"fmt"
 
@@ -9,7 +10,7 @@ import (
 	"github.com/lib/pq"
 )
 
-func InsertSubject(db *sql.DB, req *textService.CreateSubjectRequest) (*textService.CreateSubjectResponse, error) {
+func InsertSubject(ctx context.Context, db *sql.DB, req *textService.CreateSubjectRequest) (*textService.CreateSubjectResponse, error) {
 	id := uuid.New()
 
 	_, err := db.Exec("INSERT INTO subjects (id, name) VALUES ($1, $2)",
@@ -23,7 +24,7 @@ func InsertSubject(db *sql.DB, req *textService.CreateSubjectRequest) (*textServ
 	}, nil
 }
 
-func SelectSubject(db *sql.DB, req *textService.GetSubjectRequest) (*textService.GetSubjectResponse, error) {
+func SelectSubject(ctx context.Context, db *sql.DB, req *textService.GetSubjectRequest) (*textService.GetSubjectResponse, error) {
 	subjectResponse := &textService.GetSubjectResponse{
 		Subject: &textService.Subject{
 			SectionIds: make([]string, 0),
@@ -39,7 +40,7 @@ func SelectSubject(db *sql.DB, req *textService.GetSubjectRequest) (*textService
 	return subjectResponse, nil
 }
 
-func SelectSubjects(db *sql.DB) (*textService.GetSubjectsResponse, error) {
+func SelectSubjects(ctx context.Context, db *sql.DB) (*textService.GetSubjectsResponse, error) {
 	subjects, err := db.Query("SELECT id, name, class_id, section_ids FROM subjects")
 	if err != nil {
 		return nil, fmt.Errorf("pgSelectSubjects: failed to select subjects from database: %v", err)
@@ -70,7 +71,7 @@ func SelectSubjects(db *sql.DB) (*textService.GetSubjectsResponse, error) {
 	}, nil
 }
 
-func AddSectionInSubject(db *sql.DB, req *textService.AddSectionInSubjectRequest) (*textService.AddSectionInSubjectResponse, error) {
+func AddSectionInSubject(ctx context.Context, db *sql.Tx, req *textService.AddSectionInSubjectRequest) (*textService.AddSectionInSubjectResponse, error) {
 	_, err := db.Exec("UPDATE subjects SET section_ids = array_append(section_ids, $1) WHERE id = $2", req.SectionId, req.Id)
 	if err != nil {
 		return nil, fmt.Errorf("pgUpdateSubject: failed to add section in subject: %v", err)
@@ -81,7 +82,7 @@ func AddSectionInSubject(db *sql.DB, req *textService.AddSectionInSubjectRequest
 	}, nil
 }
 
-func RemoveSectionFromSubject(db *sql.DB, req *textService.RemoveSectionFromSubjectRequest) (*textService.RemoveSectionFromSubjectResponse, error) {
+func RemoveSectionFromSubject(ctx context.Context, db *sql.DB, req *textService.RemoveSectionFromSubjectRequest) (*textService.RemoveSectionFromSubjectResponse, error) {
 	_, err := db.Exec("UPDATE subjects SET section_ids = array_remove(section_ids, $1) WHERE id = $2", req.SectionId, req.Id)
 	if err != nil {
 		return nil, fmt.Errorf("pgUpdateSubject: failed to remove section in subject: %v", err)
@@ -92,7 +93,7 @@ func RemoveSectionFromSubject(db *sql.DB, req *textService.RemoveSectionFromSubj
 	}, nil
 }
 
-func DeleteSubject(db *sql.DB, req *textService.DeleteSubjectRequest) (*textService.DeleteSubjectResponse, error) {
+func DeleteSubject(ctx context.Context, db *sql.DB, req *textService.DeleteSubjectRequest) (*textService.DeleteSubjectResponse, error) {
 	_, err := db.Exec("DELETE FROM subjects WHERE id = $1", req.Id)
 	if err != nil {
 		return nil, fmt.Errorf("pgDeleteSubject: failed to delete subject from database: %v", err)
