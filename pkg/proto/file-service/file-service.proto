@@ -6,7 +6,7 @@ option go_package = "pkg/api/file-service";
 
 
 service File{
-  rpc GetFile(GetFileRequest) returns (GetFileResponse); // Клиент загружает файл по частям
+  rpc GetFile(GetFileRequest) returns (GetFileResponse);
 }
 
 message GetFileRequest {
