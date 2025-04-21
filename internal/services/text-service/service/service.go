@@ -1,8 +1,8 @@
 package service
 
 import (
-	textService "api-repository/pkg/api/text-service"
 	"api-repository/internal/services/text-service/service/internal/handlers"
+	textService "api-repository/pkg/api/text-service"
 	"context"
 	"database/sql"
 
@@ -89,25 +89,25 @@ func (ts *TextService) CreateSection(ctx context.Context, request *textService.C
 	return ts.textHandler.CreateSection(ctx, request)
 }
 
-// func (ts *TextService) GetSection(ctx context.Context, request *textService.GetSectionRequest) (*textService.GetSectionResponse, error) {
-// 	return ts.textHandler.GetSection(ctx, request)
-// }
+func (ts *TextService) GetSection(ctx context.Context, request *textService.GetSectionRequest) (*textService.GetSectionResponse, error) {
+	return ts.textHandler.GetSection(ctx, request)
+}
 
-// func (ts *TextService) GetSections(ctx context.Context, request *textService.GetSectionsRequest) (*textService.GetSectionsResponse, error) {
-// 	return ts.textHandler.GetSections(ctx)
-// }
+func (ts *TextService) GetSections(ctx context.Context, request *textService.GetSectionsRequest) (*textService.GetSectionsResponse, error) {
+	return ts.textHandler.GetSections(ctx)
+}
 
-// func (ts *TextService) AddLessonsInSection(ctx context.Context, request *textService.AddLessonsInSectionRequest) (*textService.AddLessonsInSectionResponse, error) {
-// 	return ts.textHandler.AddLessonsInSection(ctx, request)
-// }
+func (ts *TextService) AddLessonInSection(ctx context.Context, request *textService.AddLessonInSectionRequest) (*textService.AddLessonInSectionResponse, error) {
+	return ts.textHandler.AddLessonInSection(ctx, request)
+}
 
-// func (ts *TextService) RemoveLessonsFromSection(ctx context.Context, request *textService.RemoveLessonFromSectionRequest) (*textService.RemoveLessonFromSectionResponse, error) {
-// 	return ts.textHandler.RemoveLessonsFromSection(ctx, request)
-// }
+func (ts *TextService) RemoveLessonFromSection(ctx context.Context, request *textService.RemoveLessonFromSectionRequest) (*textService.RemoveLessonFromSectionResponse, error) {
+	return ts.textHandler.RemoveLessonFromSection(ctx, request)
+}
 
-// func (ts *TextService) DeleteSection(ctx context.Context, request *textService.DeleteSectionRequest) (*textService.DeleteSectionResponse, error) {
-// 	return ts.textHandler.DeleteSection(ctx, request)
-// }
+func (ts *TextService) DeleteSection(ctx context.Context, request *textService.DeleteSectionRequest) (*textService.DeleteSectionResponse, error) {
+	return ts.textHandler.DeleteSection(ctx, request)
+}
 
 //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // Lesson

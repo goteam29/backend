@@ -7,6 +7,7 @@ option go_package = "pkg/api/text-service";
 import "google/api/annotations.proto";
 
 service Text{
+  // Class
   rpc CreateClass(CreateClassRequest) returns (CreateClassResponse){
     option(google.api.http) = {
         post: "/api/v0/class"
@@ -22,26 +23,23 @@ service Text{
       get: "/api/v0/classes"
     };
   };
-
-
   rpc AddSubjectInClass(AddSubjectInClassRequest) returns (AddSubjectInClassResponse){
     option (google.api.http) = {
       post: "/api/v0/class-subject"
     };
   };
-
   rpc RemoveSubjectFromClass(RemoveSubjectFromClassRequest) returns (RemoveSubjectFromClassResponse){
     option (google.api.http) = {
       delete: "/api/v0/class-subject"
     };
   };
-
   rpc DeleteClass(DeleteClassRequest) returns (DeleteClassResponse){
     option (google.api.http) = {
         delete: "/api/v0/class"
     };
   };
 
+  // Subject
   rpc CreateSubject(CreateSubjectRequest) returns (CreateSubjectResponse){
     option (google.api.http) = {
       post: "/api/v0/subject"
@@ -73,6 +71,7 @@ service Text{
     };
   };
 
+  // Section
   rpc CreateSection(CreateSectionRequest) returns (CreateSectionResponse){
     option (google.api.http) = {
       post: "/api/v0/section"
@@ -83,7 +82,28 @@ service Text{
       get: "/api/v0/section"
     };
   };
+  rpc GetSections(GetSectionsRequest) returns (GetSectionsResponse){
+    option (google.api.http) = {
+      get: "/api/v0/sections"
+    };
+  };
+  rpc AddLessonInSection(AddLessonInSectionRequest) returns (AddLessonInSectionResponse){
+    option (google.api.http) = {
+      post: "/api/v0/section-lesson"
+    };
+  };
+  rpc RemoveLessonFromSection(RemoveLessonFromSectionRequest) returns (RemoveLessonFromSectionResponse){
+    option (google.api.http) = {
+      delete: "/api/v0/section-lesson"
+    };
+  };
+  rpc DeleteSection(DeleteSectionRequest) returns (DeleteSectionResponse){
+    option (google.api.http) = {
+      delete: "/api/v0/section"
+    };
+  };
 
+  // Lesson
   rpc CreateLesson(CreateLessonRequest) returns (CreateLessonResponse){
     option (google.api.http) = {
       post: "/api/v0/lesson"
@@ -255,12 +275,12 @@ message GetSectionsResponse{
   repeated Section sections = 1;
 }
 
-message AddLessonsInSectionRequest{
+message AddLessonInSectionRequest{
   string id = 1;
   string lesson_id = 2;
 }
 
-message AddLessonsInSectionResponse{
+message AddLessonInSectionResponse{
   string lesson_id = 1;
 }
 
