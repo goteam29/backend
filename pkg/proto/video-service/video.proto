@@ -13,10 +13,18 @@ service Video {
 
   rpc SetVideoChunk(SetVideoChunkRequest) returns (SetVideoChunkResponse){
     option(google.api.http) = {
+      post: "/video/v0/verify",
+      body: "*",
+    };
+  }
+
+  rpc AddToVideoChunk(AddToVideoChunkRequest) returns (AddToVideoChunkResponse){
+    option(google.api.http) = {
       post: "/video/v0",
       body: "*",
     };
   }
+
   rpc GetVideoChunk(GetVideoChunkRequest) returns (GetVideoChunkResponse){
     option(google.api.http) = {
       get: "/video/v0",
@@ -48,10 +56,18 @@ message GetVideoStreamResponse {
 
 //CHUNKS
 //set
-message SetVideoChunkRequest {
-  string video_id = 1;
-  string video_name = 2;
-  bytes chunk_data = 3;
+message AddToVideoChunkRequest {
+  string video_name = 1;
+  bytes chunk_data = 2;
+}
+
+message AddToVideoChunkResponse {
+  string video_name = 1;
+}
+
+
+message SetVideoChunkRequest{
+  string video_name = 1;
 }
 
 message SetVideoChunkResponse {

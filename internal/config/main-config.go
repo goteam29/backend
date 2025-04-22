@@ -10,7 +10,7 @@ import (
 
 type MainConfig struct {
 	GatewayPort      int               `yaml:"GATEWAY_PORT" env:"GATEWAY_PORT" env-default:"8080"`
-	VideoGatewayPort int               `yaml:"VIDEO_GATEWAY_PORT" env:"GATEWAY_PORT" env-default:"8080"`
+	VideoGatewayPort int               `yaml:"VIDEO_GATEWAY_PORT" env:"GATEWAY_PORT" env-default:"8081"`
 	SecretToken      string            `yaml:"JWT_SECRET"`
 	UserServicePort  int               `yaml:"USER_SERVICE_PORT" env:"USER_SERVICE_PORT" env-default:"50051"`
 	FileServicePort  int               `yaml:"FILE_SERVICE_PORT" env:"FILE_SERVICE_PORT" env-default:"50052"`

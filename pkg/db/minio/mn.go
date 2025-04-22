@@ -2,8 +2,10 @@ package minio
 
 import (
 	"api-repository/pkg/utils"
+	"context"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
+	"log"
 )
 
 type MnConfig struct {
@@ -24,5 +26,29 @@ func NewVideoMinioConnection(cfg MnConfig) *minio.Client {
 		utils.GetSugaredLogger().Fatalf("can't connect to minio | err: %v", err)
 		return nil
 	}
+
+	createBucket(client, "videos")
+
 	return client
+}
+
+func createBucket(client *minio.Client, bucketName string) {
+	ctx := context.Background()
+
+	exists, err := client.BucketExists(ctx, bucketName)
+	if err != nil {
+		log.Fatalf("ошибка проверки бакета: %v", err)
+	}
+
+	if !exists {
+		err = client.MakeBucket(ctx, bucketName, minio.MakeBucketOptions{
+			Region: "us-east-1",
+		})
+		if err != nil {
+			log.Fatalf("ошибка создания бакета: %v", err)
+		}
+		log.Printf("Бакет %s создан", bucketName)
+	} else {
+		log.Printf("Бакет %s уже существует", bucketName)
+	}
 }

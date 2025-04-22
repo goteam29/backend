@@ -38,7 +38,7 @@ func main() {
 	videoService.RegisterVideoServer(server, svc)
 
 	log.Printf("Configuration:\n%s", services.GetBeautifulConfigurationString(cfg))
-	log.Print(services.GetServerStartedLogString(time.Now(), cfg.VideoGatewayPort, "video-service"))
+	log.Print(services.GetServerStartedLogString(time.Now(), cfg.VideServicePort, "video-service"))
 
 	log.Fatal(server.Serve(lis))
 }

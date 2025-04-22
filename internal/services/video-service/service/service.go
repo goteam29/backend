@@ -20,10 +20,14 @@ func NewVideoService(m *minio.Client) *VideoService {
 	}
 }
 
-func (vs *VideoService) GetVideo(ctx context.Context, req *videoService.GetVideoChunkRequest) (*videoService.GetVideoChunkResponse, error) {
-	return vs.videoHandler.GetVideo(ctx, req)
+func (vs *VideoService) GetVideoChunk(ctx context.Context, req *videoService.GetVideoChunkRequest) (*videoService.GetVideoChunkResponse, error) {
+	return vs.videoHandler.GetVideoChunk(ctx, req)
 }
 
-func (vs *VideoService) SetVideo(ctx context.Context, req *videoService.SetVideoChunkRequest) (*videoService.SetVideoChunkResponse, error) {
-	return vs.videoHandler.SetVideo(ctx, req)
+func (vs *VideoService) SetVideoChunk(ctx context.Context, req *videoService.SetVideoChunkRequest) (*videoService.SetVideoChunkResponse, error) {
+	return vs.videoHandler.SetVideoChunk(ctx, req)
+}
+
+func (vs *VideoService) AddToVideoChunk(ctx context.Context, req *videoService.AddToVideoChunkRequest) (*videoService.AddToVideoChunkResponse, error) {
+	return vs.videoHandler.AddToVideoChunk(ctx, req)
 }

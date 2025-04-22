@@ -29,14 +29,14 @@ func main() {
 	createVideoServiceConnection(ctx, mux, cfg)
 
 	utils.GetSugaredLogger().Logf(0, "VIDEO-GATEWAY STARTED | port %d", cfg.VideoGatewayPort)
-	if err = http.ListenAndServe(fmt.Sprintf(":%d", cfg.VideoGatewayPort+1), mux); err != nil {
+	if err = http.ListenAndServe(fmt.Sprintf(":%d", cfg.VideoGatewayPort), mux); err != nil {
 		utils.GetSugaredLogger().Fatalf("Gateway stopped %v", err)
 	}
 
 }
 
 func createVideoServiceConnection(ctx context.Context, mux *runtime.ServeMux, cfg *config.MainConfig) {
-	conn, err := grpc.NewClient(fmt.Sprintf("localhost:%d", cfg.VideoGatewayPort+1), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(fmt.Sprintf("localhost:%d", cfg.VideServicePort), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		utils.GetSugaredLogger().Fatalf("can't connect to video-service | err: %v", err)
 	}
