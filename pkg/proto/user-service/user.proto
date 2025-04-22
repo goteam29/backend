@@ -8,17 +8,19 @@ package user_service;
 service User{
     rpc Get(Request) returns (Reply){
         option (google.api.http) = {
-            get: "/v1/ping"
+            get: "/api/v0/ping"
         };
     };
     rpc Register(RegisterRequest) returns (RegisterResponse){
         option (google.api.http) = {
-            post: "/v1/register"
+            post: "/api/v0/register"
+            body: "*"
         };
     };
     rpc Login(LoginRequest) returns (LoginResponse){
         option (google.api.http) = {
-            get: "/v1/login"
+            post: "/api/v0/login"
+            body: "*"
         };
     };
 }

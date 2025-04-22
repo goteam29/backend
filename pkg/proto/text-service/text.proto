@@ -12,6 +12,7 @@ service Text{
   rpc CreateClass(CreateClassRequest) returns (CreateClassResponse){
     option(google.api.http) = {
         post: "/api/v0/class"
+        body: "*"
     };
   }
 
@@ -29,6 +30,7 @@ service Text{
   rpc AddSubjectInClass(AddSubjectInClassRequest) returns (AddSubjectInClassResponse){
     option (google.api.http) = {
       post: "/api/v0/class-subject"
+      body: "*"
     };
   };
   rpc RemoveSubjectFromClass(RemoveSubjectFromClassRequest) returns (RemoveSubjectFromClassResponse){
@@ -48,6 +50,7 @@ service Text{
   rpc CreateSubject(CreateSubjectRequest) returns (CreateSubjectResponse){
     option (google.api.http) = {
       post: "/api/v0/subject"
+      body: "*"
     };
   };
 
@@ -65,6 +68,7 @@ service Text{
   rpc AddSectionInSubject(AddSectionInSubjectRequest) returns (AddSectionInSubjectResponse){
     option (google.api.http) = {
       post: "/api/v0/section-subject"
+      body: "*"
     };
   };
   rpc RemoveSectionFromSubject(RemoveSectionFromSubjectRequest) returns (RemoveSectionFromSubjectResponse){
@@ -84,6 +88,7 @@ service Text{
   rpc CreateSection(CreateSectionRequest) returns (CreateSectionResponse){
     option (google.api.http) = {
       post: "/api/v0/section"
+      body: "*"
     };
   };
 
@@ -101,6 +106,7 @@ service Text{
   rpc AddLessonInSection(AddLessonInSectionRequest) returns (AddLessonInSectionResponse){
     option (google.api.http) = {
       post: "/api/v0/section-lesson"
+      body: "*"
     };
   };
   rpc RemoveLessonFromSection(RemoveLessonFromSectionRequest) returns (RemoveLessonFromSectionResponse){
@@ -120,6 +126,7 @@ service Text{
   rpc CreateLesson(CreateLessonRequest) returns (CreateLessonResponse){
     option (google.api.http) = {
       post: "/api/v0/lesson"
+      body: "*"
     };
   };
 
@@ -137,6 +144,7 @@ service Text{
   rpc AddVideoInLesson(AddVideoInLessonRequest) returns (AddVideoInLessonResponse){
     option (google.api.http) = {
       post: "/api/v0/lesson-video"
+      body: "*"
     };
   };
   rpc RemoveVideoFromLesson(RemoveVideoFromLessonRequest) returns (RemoveVideoFromLessonResponse){
@@ -148,17 +156,20 @@ service Text{
   rpc AddFileInLesson(AddFileInLessonRequest) returns (AddFileInLessonResponse){
     option (google.api.http) = {
       post: "/api/v0/lesson-file"
+      body: "*"
     };
   };
   rpc RemoveFileFromLesson(RemoveFileFromLessonRequest) returns (RemoveFileFromLessonResponse){
     option (google.api.http) = {
       delete: "/api/v0/lesson-file"
+
     };
   };
 
   rpc AddExerciseInLesson(AddExerciseInLessonRequest) returns (AddExerciseInLessonResponse){
     option (google.api.http) = {
       post: "/api/v0/lesson-exercise"
+      body: "*"
     };
   };
   rpc RemoveExerciseFromLesson(RemoveExerciseFromLessonRequest) returns (RemoveExerciseFromLessonResponse){
@@ -170,6 +181,7 @@ service Text{
   rpc AddCommentInLesson(AddCommentInLessonRequest) returns (AddCommentInLessonResponse){
     option (google.api.http) = {
       post: "/api/v0/lesson-comment"
+      body: "*"
     };
   };
   rpc RemoveCommentFromLesson(RemoveCommentFromLessonRequest) returns (RemoveCommentFromLessonResponse){
@@ -181,6 +193,7 @@ service Text{
   rpc IncreaseRating(IncreaseRatingRequest) returns (IncreaseRatingResponse){
     option (google.api.http) = {
       post: "/api/v0/lesson-rating"
+      body: "*"
     };
   };
   rpc DecreaseRating(DecreaseRatingRequest) returns (DecreaseRatingResponse){

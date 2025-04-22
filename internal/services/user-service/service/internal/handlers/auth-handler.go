@@ -6,10 +6,13 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"github.com/google/uuid"
+	"github.com/lib/pq"
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"log"
 	"time"
 )
 
@@ -35,6 +38,8 @@ func (ah *AuthHandler) Register(ctx context.Context, req *userservice.RegisterRe
 		return nil, status.Error(codes.InvalidArgument, "passwords do not match")
 	}
 
+	log.Printf("%v", req)
+
 	passwordHash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "can't hash password %v", err)
@@ -45,6 +50,12 @@ func (ah *AuthHandler) Register(ctx context.Context, req *userservice.RegisterRe
 	query := `INSERT into users (id, username, email, password_hash) values ($1, $2, $3, $4)`
 	_, err = ah.db.Exec(query, id, req.Username, req.Email, string(passwordHash))
 	if err != nil {
+		var pqErr *pq.Error
+		if errors.As(err, &pqErr) {
+			if pqErr.Code == "23505" {
+				return nil, fmt.Errorf("user with this email already exists")
+			}
+		}
 		return nil, status.Errorf(codes.Internal, "can't insert user into bd | err: %v", err)
 	}
 	return &userservice.RegisterResponse{
