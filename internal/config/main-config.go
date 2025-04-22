@@ -10,8 +10,8 @@ import (
 
 type MainConfig struct {
 	GatewayPort     int               `yaml:"GATEWAY_PORT" env:"GATEWAY_PORT" env-default:"8080"`
+	SecretToken     string            `yaml:"JWT_SECRET"`
 	UserServicePort int               `yaml:"USER_SERVICE_PORT" env:"USER_SERVICE_PORT" env-default:"50051"`
-	UserServiceAddr string            `yaml:"USER_SERVICE_ADDR" env:"SOURCE_SERVICE_ADDR" env-default:"localhost:50051"`
 	FileServicePort int               `yaml:"FILE_SERVICE_PORT" env:"FILE_SERVICE_PORT" env-default:"50052"`
 	TextServicePort int               `yaml:"TEXT_SERVICE_PORT" env:"TEXT_SERVICE_PORT" env-default:"50053"`
 	POSTGRES        postgres.PgConfig `yaml:"POSTGRES"`

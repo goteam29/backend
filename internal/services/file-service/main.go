@@ -3,6 +3,7 @@ package main
 import (
 	"api-repository/internal/config"
 	"api-repository/internal/services/file-service/service"
+	"api-repository/pkg/utils"
 	"log"
 	"os"
 	"os/signal"
@@ -10,6 +11,8 @@ import (
 )
 
 func main() {
+	utils.CreateNewSugaredLogger()
+
 	cfg, err := config.NewMainConfig()
 	if err != nil {
 		log.Fatalf("Config error: %v", err)

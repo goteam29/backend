@@ -6,6 +6,7 @@ import (
 	"api-repository/internal/services/user-service/service"
 	user_service "api-repository/pkg/api/user-service"
 	"api-repository/pkg/db/postgres"
+	"api-repository/pkg/utils"
 	"log"
 	"net"
 	"strconv"
@@ -15,6 +16,8 @@ import (
 )
 
 func main() {
+	utils.CreateNewSugaredLogger()
+
 	cfg, err := config.NewMainConfig()
 	if err != nil {
 		log.Fatalf("can't get env files | err: %v", err)
@@ -24,7 +27,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("can't connect to postgres | err: %v", err)
 	}
-	svc := service.NewUserService(pgConn)
+	svc := service.NewUserService(pgConn, cfg)
 
 	lis, err := net.Listen("tcp", ":"+strconv.Itoa(cfg.UserServicePort))
 	if err != nil {
@@ -34,6 +37,8 @@ func main() {
 	server := grpc.NewServer()
 	user_service.RegisterUserServer(server, svc)
 
-	log.Print(services.GetServerStartedLogString(cfg, time.Now(), cfg.UserServicePort, "user-service"))
+	log.Print(services.GetServerStartedLogString(time.Now(), cfg.UserServicePort, "user-service"))
+	log.Printf("Configuration:\n%s", services.GetBeautifulConfigurationString(cfg))
+
 	log.Fatal(server.Serve(lis))
 }

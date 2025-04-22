@@ -29,7 +29,7 @@ func New(ctx context.Context) (context.Context, error) {
 	return ctx, nil
 }
 
-func NewSugaredLogger() {
+func CreateNewSugaredLogger() {
 	lg, err := zap.NewProduction()
 	if err != nil {
 		log.Fatalf("can't create logger | err: %v", err)

@@ -1,12 +1,12 @@
 package service
 
 import (
+	"api-repository/internal/config"
 	"api-repository/internal/services/user-service/service/internal/handlers"
 	userservice "api-repository/pkg/api/user-service"
 	"context"
 	"database/sql"
 	"log"
-	"os"
 	"sync"
 
 	"github.com/joho/godotenv"
@@ -20,22 +20,17 @@ type UserService struct {
 	pgConn      *sql.DB
 }
 
-func NewUserService(pc *sql.DB) *UserService {
+func NewUserService(pc *sql.DB, cfg *config.MainConfig) *UserService {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
-	}
-
-	secret, ok := os.LookupEnv("JWT_SECRET_TOKEN")
-	if !ok {
-		log.Println("JWT_SECRET_TOKEN is not present")
 	}
 
 	var s *UserService
 	once.Do(func() {
 		s = &UserService{
 			pgConn:      pc,
-			authHandler: handlers.NewAuthHandler(pc, secret),
+			authHandler: handlers.NewAuthHandler(pc, cfg.SecretToken),
 		}
 	})
 

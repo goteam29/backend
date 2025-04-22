@@ -2,21 +2,26 @@ package main
 
 import (
 	"api-repository/internal/config"
+	"api-repository/internal/interceptors"
 	"api-repository/internal/services/text-service/service"
 	textService "api-repository/pkg/api/text-service"
 	"api-repository/pkg/db/postgres"
 	"api-repository/pkg/db/redis"
+	"api-repository/pkg/utils"
 	"context"
 	"log"
 	"net"
 	"os"
 	"os/signal"
 	"strconv"
+	"time"
 
 	"google.golang.org/grpc"
 )
 
 func main() {
+	utils.CreateNewSugaredLogger()
+
 	ctx := context.Background()
 	ctx, stop := signal.NotifyContext(ctx, os.Interrupt)
 	defer stop()
@@ -42,7 +47,11 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	server := grpc.NewServer()
+	jwtManager := utils.NewJWTManager(cfg.SecretToken, 7*24*time.Hour)
+	opts := []grpc.ServerOption{
+		grpc.UnaryInterceptor(interceptors.AuthInterceptor(jwtManager)),
+	}
+	server := grpc.NewServer(opts...)
 	svc := service.NewTextService(pgConn, redisConn)
 	textService.RegisterTextServer(server, svc)
 
