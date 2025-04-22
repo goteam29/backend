@@ -2,6 +2,7 @@ package utils
 
 import (
 	"context"
+	"log"
 
 	"go.uber.org/zap"
 )
@@ -11,11 +12,14 @@ const (
 	RequestID = "requestID"
 )
 
+var sugaredLogger *zap.SugaredLogger
+
 type Logger struct {
 	l *zap.Logger
 }
 
 func New(ctx context.Context) (context.Context, error) {
+
 	logger, err := zap.NewProduction()
 	if err != nil {
 		return nil, err
@@ -23,6 +27,18 @@ func New(ctx context.Context) (context.Context, error) {
 
 	ctx = context.WithValue(ctx, Key, &Logger{logger})
 	return ctx, nil
+}
+
+func NewSugaredLogger() {
+	lg, err := zap.NewProduction()
+	if err != nil {
+		log.Fatalf("can't create logger | err: %v", err)
+	}
+	sugaredLogger = lg.Sugar()
+}
+
+func GetSugaredLogger() *zap.SugaredLogger {
+	return sugaredLogger
 }
 
 func GetLoggerFromContext(ctx context.Context) *Logger {
