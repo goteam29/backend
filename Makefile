@@ -7,6 +7,13 @@ generate_api:
 	  pkg/proto/file-service/file-service.proto
 
 	protoc \
+  	  --proto_path=./pkg/proto \
+  	  --go_out=. \
+  	  --go-grpc_out=. \
+  	  --grpc-gateway_out=. \
+  	  pkg/proto/video-service/video.proto
+
+	protoc \
 	  --proto_path=./pkg/proto \
 	  --go_out=. \
 	  --go-grpc_out=. \
@@ -19,6 +26,8 @@ generate_api:
 	  --go-grpc_out=. \
 	  --grpc-gateway_out=. \
 	  pkg/proto/user-service/user.proto
+
+
 
 
 build:

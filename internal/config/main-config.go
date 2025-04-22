@@ -9,14 +9,16 @@ import (
 )
 
 type MainConfig struct {
-	GatewayPort     int               `yaml:"GATEWAY_PORT" env:"GATEWAY_PORT" env-default:"8080"`
-	SecretToken     string            `yaml:"JWT_SECRET"`
-	UserServicePort int               `yaml:"USER_SERVICE_PORT" env:"USER_SERVICE_PORT" env-default:"50051"`
-	FileServicePort int               `yaml:"FILE_SERVICE_PORT" env:"FILE_SERVICE_PORT" env-default:"50052"`
-	TextServicePort int               `yaml:"TEXT_SERVICE_PORT" env:"TEXT_SERVICE_PORT" env-default:"50053"`
-	POSTGRES        postgres.PgConfig `yaml:"POSTGRES"`
-	REDIS           redis.RConfig     `yaml:"REDIS"`
-	MinIO           minio.MnConfig    `yaml:"MINIO"`
+	GatewayPort      int               `yaml:"GATEWAY_PORT" env:"GATEWAY_PORT" env-default:"8080"`
+	VideoGatewayPort int               `yaml:"VIDEO_GATEWAY_PORT" env:"GATEWAY_PORT" env-default:"8080"`
+	SecretToken      string            `yaml:"JWT_SECRET"`
+	UserServicePort  int               `yaml:"USER_SERVICE_PORT" env:"USER_SERVICE_PORT" env-default:"50051"`
+	FileServicePort  int               `yaml:"FILE_SERVICE_PORT" env:"FILE_SERVICE_PORT" env-default:"50052"`
+	TextServicePort  int               `yaml:"TEXT_SERVICE_PORT" env:"TEXT_SERVICE_PORT" env-default:"50053"`
+	VideServicePort  int               `yaml:"VIDEO_SERVICE_PORT" env:"TEXT_SERVICE_PORT" env-default:"50053"`
+	POSTGRES         postgres.PgConfig `yaml:"POSTGRES"`
+	REDIS            redis.RConfig     `yaml:"REDIS"`
+	MinIO            minio.MnConfig    `yaml:"MINIO"`
 }
 
 func NewMainConfig() (*MainConfig, error) {

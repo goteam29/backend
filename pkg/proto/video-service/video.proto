@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package video_service;
+
+option go_package = "pkg/api/video-service";
+
+import "google/api/annotations.proto";
+
+
+service Video {
+  rpc SetVideoStream(stream SetVideoStreamRequest) returns (SetVideoStreamResponse);
+  rpc GetVideoStream(GetVideoStreamRequest) returns (stream GetVideoStreamResponse);
+
+  rpc SetVideoChunk(SetVideoChunkRequest) returns (SetVideoChunkResponse){
+    option(google.api.http) = {
+      post: "/video/v0",
+      body: "*",
+    };
+  }
+  rpc GetVideoChunk(GetVideoChunkRequest) returns (GetVideoChunkResponse){
+    option(google.api.http) = {
+      get: "/video/v0",
+    };
+  }
+}
+
+
+//STREAMS
+//set
+message SetVideoStreamRequest {
+  string video_name = 1;
+  bytes chunk_data = 2;
+}
+
+message SetVideoStreamResponse {
+  string video_id = 1;
+}
+
+//get
+message GetVideoStreamRequest {
+  string video_id = 1;
+}
+
+message GetVideoStreamResponse {
+  bytes chunk_data = 1;
+}
+
+
+//CHUNKS
+//set
+message SetVideoChunkRequest {
+  string video_id = 1;
+  string video_name = 2;
+  bytes chunk_data = 3;
+}
+
+message SetVideoChunkResponse {
+  string video_id = 1;
+}
+
+//get
+message GetVideoChunkRequest {
+  string video_id = 1;
+}
+
+message GetVideoChunkResponse {
+  bytes chunk_data = 1;
+}

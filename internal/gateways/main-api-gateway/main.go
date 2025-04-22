@@ -35,7 +35,7 @@ func main() {
 	createTextServiceConnection(ctx, mux, cfg)
 	createFileServiceConnection(ctx, mux, cfg)
 
-	utils.GetSugaredLogger().Logf(1, "GATEWAY STARTED | port: %d", cfg.GatewayPort)
+	utils.GetSugaredLogger().Logf(0, "GATEWAY STARTED | port: %d", cfg.GatewayPort)
 	if err := http.ListenAndServe(fmt.Sprintf(":%d", cfg.GatewayPort), mux); err != nil {
 		log.Fatalf("Gateway stopped: %v", err)
 	}
@@ -44,12 +44,12 @@ func main() {
 func createUserServiceConnection(ctx context.Context, mux *runtime.ServeMux, cfg *config.MainConfig) {
 	conn, err := grpc.NewClient(fmt.Sprintf("localhost:%d", cfg.UserServicePort), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Fatalf("could not connect to UserService: %v", err)
+		utils.GetSugaredLogger().Fatalf("can't connect to user-service | err: %v", err)
 	}
 
 	client := us.NewUserClient(conn)
-	if err := us.RegisterUserHandlerClient(ctx, mux, client); err != nil {
-		log.Fatalf("failed to register the user server: %v", err)
+	if err = us.RegisterUserHandlerClient(ctx, mux, client); err != nil {
+		utils.GetSugaredLogger().Fatalf("failed to register user-service client | err: %v", err)
 	}
 }
 

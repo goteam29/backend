@@ -3,8 +3,8 @@ package service
 import (
 	"api-repository/internal/config"
 	"api-repository/internal/services/file-service/service/internal/handlers"
-	"api-repository/pkg/db/minio"
 	"context"
+	"github.com/minio/minio-go/v7"
 	"log"
 	"net"
 	"strconv"
