@@ -85,6 +85,7 @@ func (a *AuthHandler) Login(ctx context.Context, req *userservice.LoginRequest) 
 	}
 
 	return &userservice.LoginResponse{
+		Uuid:  id,
 		Token: token,
 	}, nil
 }
