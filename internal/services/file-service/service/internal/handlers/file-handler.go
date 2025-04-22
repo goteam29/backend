@@ -2,15 +2,15 @@ package handlers
 
 import (
 	fileservice "api-repository/pkg/api/file-service"
-	"api-repository/pkg/db/minio"
+	"api-repository/pkg/db/file-minio"
 	"context"
 )
 
 type FileHandler struct {
-	minio *minio.Client
+	minio *file_minio.Client
 }
 
-func NewFileHandler(_minio *minio.Client) *FileHandler {
+func NewFileHandler(_minio *file_minio.Client) *FileHandler {
 	return &FileHandler{
 		minio: _minio,
 	}
