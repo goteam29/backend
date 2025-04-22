@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	textService "api-repository/pkg/api/text-service"
 	postgresRepo "api-repository/internal/services/text-service/service/internal/repository/postgres"
+	textService "api-repository/pkg/api/text-service"
 	"context"
 	"database/sql"
 	"fmt"

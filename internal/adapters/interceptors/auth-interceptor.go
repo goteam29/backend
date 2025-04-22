@@ -3,7 +3,6 @@ package interceptors
 import (
 	"api-repository/pkg/utils"
 	"context"
-	"go.uber.org/zap/zapcore"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -19,7 +18,6 @@ func AuthInterceptor(jwt *utils.JWTManager) grpc.UnaryServerInterceptor {
 		handler grpc.UnaryHandler,
 	) (any, error) {
 
-		utils.GetSugaredLogger().Logf(zapcore.InfoLevel, "gprc unary server info: %v", info)
 		if info.FullMethod == "/user.User/Register" || info.FullMethod == "/user.User/Login" {
 			return handler(ctx, req)
 		}
@@ -29,12 +27,12 @@ func AuthInterceptor(jwt *utils.JWTManager) grpc.UnaryServerInterceptor {
 			return nil, status.Error(codes.Unauthenticated, "you need to provide metadata :(")
 		}
 
-		values := md["authorisation"]
+		values := md["authorization"]
 		if len(values) == 0 {
-			return nil, status.Error(codes.Unauthenticated, "please authorise!")
+			return nil, status.Error(codes.Unauthenticated, "please authorize!")
 		}
 
-		token := strings.TrimPrefix(values[0], "Bearer")
+		token := strings.TrimSpace(strings.TrimPrefix(values[0], "Bearer"))
 		if token == values[0] {
 			return nil, status.Error(codes.Unauthenticated, "invalid token format")
 		}

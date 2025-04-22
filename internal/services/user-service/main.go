@@ -1,6 +1,7 @@
 package main
 
 import (
+	"api-repository/internal/adapters/interceptors"
 	"api-repository/internal/config"
 	"api-repository/internal/services"
 	"api-repository/internal/services/user-service/service"
@@ -34,11 +35,14 @@ func main() {
 		log.Fatalf("can't start servier | err: %v", err)
 	}
 
-	server := grpc.NewServer()
+	opts := []grpc.ServerOption{
+		grpc.UnaryInterceptor(interceptors.LoggingInterceptor(utils.GetSugaredLogger())),
+	}
+	server := grpc.NewServer(opts...)
 	userservice.RegisterUserServer(server, svc)
 
-	log.Print(services.GetServerStartedLogString(time.Now(), cfg.UserServicePort, "user-service"))
 	log.Printf("Configuration:\n%s", services.GetBeautifulConfigurationString(cfg))
+	log.Print(services.GetServerStartedLogString(time.Now(), cfg.UserServicePort, "user-service"))
 
 	log.Fatal(server.Serve(lis))
 }

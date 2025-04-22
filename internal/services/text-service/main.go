@@ -1,8 +1,9 @@
 package main
 
 import (
+	"api-repository/internal/adapters/interceptors"
 	"api-repository/internal/config"
-	"api-repository/internal/interceptors"
+	"api-repository/internal/services"
 	"api-repository/internal/services/text-service/service"
 	textService "api-repository/pkg/api/text-service"
 	"api-repository/pkg/db/postgres"
@@ -49,13 +50,18 @@ func main() {
 
 	jwtManager := utils.NewJWTManager(cfg.SecretToken, 7*24*time.Hour)
 	opts := []grpc.ServerOption{
-		grpc.UnaryInterceptor(interceptors.AuthInterceptor(jwtManager)),
+		grpc.ChainUnaryInterceptor(
+			interceptors.AuthInterceptor(jwtManager),
+			interceptors.LoggingInterceptor(utils.GetSugaredLogger()),
+		),
 	}
 	server := grpc.NewServer(opts...)
+
 	svc := service.NewTextService(pgConn, redisConn)
 	textService.RegisterTextServer(server, svc)
 
-	log.Print("text service started at port: ", cfg.TextServicePort)
+	log.Printf("Configuration:\n%s", services.GetBeautifulConfigurationString(cfg))
+	log.Println(services.GetServerStartedLogString(time.Now(), cfg.TextServicePort, "text-service"))
 	go func() {
 		if err := server.Serve(lis); err != nil {
 			log.Fatalf("failed to serve: %v", err)
