@@ -4,7 +4,7 @@ import (
 	"api-repository/internal/config"
 	"api-repository/internal/services"
 	"api-repository/internal/services/user-service/service"
-	user_service "api-repository/pkg/api/user-service"
+	userservice "api-repository/pkg/api/user-service"
 	"api-repository/pkg/db/postgres"
 	"api-repository/pkg/utils"
 	"log"
@@ -35,7 +35,7 @@ func main() {
 	}
 
 	server := grpc.NewServer()
-	user_service.RegisterUserServer(server, svc)
+	userservice.RegisterUserServer(server, svc)
 
 	log.Print(services.GetServerStartedLogString(time.Now(), cfg.UserServicePort, "user-service"))
 	log.Printf("Configuration:\n%s", services.GetBeautifulConfigurationString(cfg))
