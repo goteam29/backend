@@ -4,7 +4,6 @@
 *.pb.go
 *pb.gw.go
 
-.env
-config/config.yml
+
 config/docker-config.yml
 storage
