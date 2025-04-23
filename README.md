@@ -86,6 +86,7 @@ Video Service [4]	Stream or upload/download videos using chunks (supports both g
 2. Reasonable distribution of services, as well as their division into two gateways
 3. Following the principles of clean architecture (CA)
 4. Convenient commands in Makefile
+5. Usage of fault tolerance patterns
 
 
 
