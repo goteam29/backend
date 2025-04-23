@@ -73,7 +73,7 @@ services:
   video-service:
     container_name: uxedu-video-service_container
     build:
-      context: .
+      context: ./internal/services/video-service
       dockerfile: internal/services/video-service/Dockerfile
     ports:
       - "50054:50054"
@@ -87,7 +87,7 @@ services:
   text-service:
     container_name: uxedu-text-service_container
     build:
-      context: .
+      context: ./internal/services/text-service
       dockerfile: internal/services/text-service/Dockerfile
     ports:
       - "50052:50052"
@@ -104,7 +104,7 @@ services:
   user-service:
     container_name: uxedu-user-service_container
     build:
-      context: .
+      context: ./internal/services/user-service
       dockerfile: internal/services/user-service/Dockerfile
     ports:
       - "50051:50051"
@@ -118,7 +118,7 @@ services:
   file-service:
     container_name: uxedu-file-service_container
     build:
-      context: .
+      context: ./internal/services/file-service
       dockerfile: internal/services/file-service/Dockerfile
     ports:
       - "50053:50053"
@@ -132,7 +132,7 @@ services:
   main-gateway:
     container_name: uxedu-main-gateway_container
     build:
-      context: .
+      context: ./internal/gateways/main-api-gateway
       dockerfile: internal/gateways/main-api-gateway/Dockerfile
     ports:
       - "8080:8080"
@@ -149,7 +149,7 @@ services:
   video-gateway:
     container_name: uxedu-video-gateway_container
     build:
-      context: .
+      context: ./internal/gateways/video-api-gateway
       dockerfile: internal/gateways/video-api-gateway/Dockerfile
     ports:
       - "8081:8081"
