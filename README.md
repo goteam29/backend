@@ -5,6 +5,47 @@ Built with gRPC and HTTP gateways <br/>
 Designed for stability, scalability, and clarity <br/>
 Easily integrable into existing systems 
 
+
+
+# 📑 Table of Contents
+
+- [📚 UxEdu: Scalable API for Modern Education Systems](#-uxedu-scalable-api-for-modern-education-systems)
+   - [🏳️ How to run the project](#️-how-to-run-the-project)
+   - [🔧 Services Overview](#-services-overview)
+   - [🧩 What Each Service Does](#-what-each-service-does)
+   - [⚙️ Tech-Stack](#️-tech-stack)
+   - [👍Our advantages](#our-advantages)
+- [🚀 Main API Gateway](#rocketmain-api-gateway)
+   - [📁 File Service API](#-file-service-api)
+      - [`GetFile`](#-getfile)
+      - [`SetFile`](#-setfile)
+      - [🧪 Example Usage (HTTP)](#-example-usage-http)
+   - [📓 Text Service](#-text-service)
+      - [1. Class Endpoints](#1-class-endpoints)
+      - [2. Subject Endpoints](#2-subject-endpoints)
+      - [3. Section Endpoints](#3-section-endpoints)
+      - [4. Lesson Endpoints](#4-lesson-endpoints)
+- [👤 User Service](#user-service)
+   - [`GET /api/v0/ping`](#get-apiv0ping)
+   - [`POST /api/v0/register`](#post-apiv0register)
+   - [`POST /api/v0/login`](#post-apiv0login)
+- [🎥 Video API Gateway](#video-api-gateway)
+   - [🎥 Video Service](#video-service)
+      - [`POST /video/v0/verify`](#post-videov0verify)
+      - [`POST /video/v0`](#post-videov0)
+      - [`GET /video/v0`](#get-videov0)
+
+
+
+## 🏳️ How to run the project
+
+I think you all have the Docker engine -> 
+```shell
+docker-compose up -d --build
+```
+
+
+
 ### 🔧 Services Overview
 UxEdu is composed of 4 gRPC services and 2 RESTful HTTP gateways, organized as follows:
 
