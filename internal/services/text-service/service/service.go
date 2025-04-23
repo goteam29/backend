@@ -70,12 +70,8 @@ func (ts *TextService) GetSubjects(ctx context.Context, request *textService.Get
 	return ts.textHandler.GetSubjects(ctx)
 }
 
-func (ts *TextService) AddSectionInSubject(ctx context.Context, request *textService.AddSectionInSubjectRequest) (*textService.AddSectionInSubjectResponse, error) {
-	return ts.textHandler.AddSectionInSubject(ctx, request)
-}
-
-func (ts *TextService) RemoveSectionFromSubject(ctx context.Context, request *textService.RemoveSectionFromSubjectRequest) (*textService.RemoveSectionFromSubjectResponse, error) {
-	return ts.textHandler.RemoveSectionFromSubject(ctx, request)
+func (ts *TextService) AssignSectionToSubject(ctx context.Context, request *textService.AssignSectionToSubjectRequest) (*textService.AssignSectionToSubjectResponse, error) {
+	return ts.textHandler.AssignSectionToSubject(ctx, request)
 }
 
 func (ts *TextService) DeleteSubject(ctx context.Context, request *textService.DeleteSubjectRequest) (*textService.DeleteSubjectResponse, error) {

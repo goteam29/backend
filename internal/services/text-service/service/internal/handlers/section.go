@@ -4,7 +4,6 @@ import (
 	postgresRepo "api-repository/internal/services/text-service/service/internal/repository/postgres"
 	textService "api-repository/pkg/api/text-service"
 	"context"
-	"database/sql"
 	"fmt"
 )
 
@@ -13,31 +12,9 @@ func (th *TextHandler) CreateSection(ctx context.Context, req *textService.Creat
 	// if err != nil {
 	// 	return nil, fmt.Errorf("insertSection: %v", err)
 	// }
-
-	tx, err := th.pg.BeginTx(ctx, &sql.TxOptions{})
-	if err != nil {
-		return nil, fmt.Errorf("pgAddSubjectInClass: failed to begin transaction: %v", err)
-	}
-	defer tx.Rollback()
-
-	id, err := postgresRepo.InsertSection(tx, req)
+	id, err := postgresRepo.InsertSection(th.pg, req)
 	if err != nil {
 		return nil, fmt.Errorf("insertSection: %v", err)
-	}
-
-	updateRequest := &textService.AddSectionInSubjectRequest{
-		Id:        req.SubjectId,
-		SectionId: id.Id,
-	}
-
-	_, err = postgresRepo.AddSectionInSubject(ctx, tx, updateRequest)
-	if err != nil {
-		return nil, fmt.Errorf("createSection: failed to add section in subject: %v", err)
-	}
-
-	err = tx.Commit()
-	if err != nil {
-		return nil, fmt.Errorf("createSection: failed to commit transaction: %v", err)
 	}
 
 	return id, nil
