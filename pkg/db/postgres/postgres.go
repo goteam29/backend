@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 
@@ -44,8 +45,8 @@ func NewPostgres(c PgConfig) (*sql.DB, error) {
 		return nil, fmt.Errorf("can't create migration | err: %v", err)
 	}
 
-	if err := m.Up(); err != nil {
-		if err == migrate.ErrNoChange {
+	if err = m.Up(); err != nil {
+		if errors.Is(err, migrate.ErrNoChange) {
 
 		} else {
 			return nil, fmt.Errorf("can't migrate database | err: %v", err)

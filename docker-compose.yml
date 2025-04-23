@@ -54,7 +54,7 @@ services:
   minio-video:
     container_name: uxedu-minio-video_container
     image: quay.io/minio/minio
-    command: server --address ":9002" --console-address ":9003" /data
+    command: server --address "0.0.0.0:9002" --console-address "0.0.0.0:9003" /data
     ports:
       - "9002:9002"
       - "9003:9003"
@@ -62,39 +62,72 @@ services:
       - ./storage/minio-video:/data
     networks:
       - video-api-network
+    environment:
+      MINIO_ENDPOINT: minio:9000
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:9002/minio/health/live" ]
       interval: 30s
       timeout: 20s
       retries: 3
 
-#  user-service:
-#    container_name: uxedu-user-service_container
-#    build:
-#      context: .
-#      dockerfile: internal/services/user-service/Dockerfile
-#    ports:
-#      - "50051:50051"
-#    depends_on:
-#      redis:
-#        condition: service_healthy
-#      postgres:
-#        condition: service_healthy
-#    networks:
-#      - main-api-network
-#  file-service:
-#    container_name: uxedu-file-service_container
-#    build:
-#      context: .
-#      dockerfile: internal/services/file-service/Dockerfile
-#    ports:
-#      - "50052:50052"
-#    depends_on:
-#      minio-default:
-#        condition: service_healthy
-#    networks:
-#      - main-api-network
-#
+  video-service:
+    container_name: uxedu-video-service_container
+    build:
+      context: .
+      dockerfile: internal/services/video-service/Dockerfile
+    ports:
+      - "50054:50054"
+    depends_on:
+      minio-video:
+        condition: service_healthy
+    networks:
+      - video-api-network
+
+
+  text-service:
+    container_name: uxedu-text-service_container
+    build:
+      context: .
+      dockerfile: internal/services/text-service/Dockerfile
+    ports:
+      - "50052:50052"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - main-api-network
+
+
+
+  user-service:
+    container_name: uxedu-user-service_container
+    build:
+      context: .
+      dockerfile: internal/services/user-service/Dockerfile
+    ports:
+      - "50051:50051"
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    networks:
+      - main-api-network
+  file-service:
+    container_name: uxedu-file-service_container
+    build:
+      context: .
+      dockerfile: internal/services/file-service/Dockerfile
+    ports:
+      - "50053:50053"
+    depends_on:
+      minio-default:
+        condition: service_healthy
+    networks:
+      - main-api-network
+
 
 networks:
   main-api-network:

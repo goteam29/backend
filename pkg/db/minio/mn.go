@@ -18,7 +18,7 @@ type MnConfig struct {
 }
 
 func NewVideoMinioConnection(cfg MnConfig) *minio.Client {
-	client, err := minio.New("localhost:9002", &minio.Options{
+	client, err := minio.New(cfg.Endpoint, &minio.Options{
 		Creds:  credentials.NewStaticV4(cfg.AccessKey, cfg.SecretKey, ""),
 		Secure: false,
 	})

@@ -15,8 +15,10 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o /file-service ./internal/services/file-
 FROM alpine:latest
 
 WORKDIR /app
-COPY --from=builder /file-service .
 
-EXPOSE 50052
+COPY --from=builder /file-service .
+COPY config/ ./config/
+
+EXPOSE 50053
 
 CMD ["./file-service"]

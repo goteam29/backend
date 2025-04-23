@@ -1,4 +1,3 @@
-
 FROM golang:1.24-alpine AS builder
 
 WORKDIR /build
@@ -16,7 +15,11 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o /user-service ./internal/services/user-
 FROM alpine:latest
 
 WORKDIR /app
+
 COPY --from=builder /user-service .
+COPY config/ ./config/
+COPY db/ ./db/
+
 
 EXPOSE 50051
 

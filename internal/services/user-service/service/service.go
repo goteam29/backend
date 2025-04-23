@@ -6,10 +6,7 @@ import (
 	userservice "api-repository/pkg/api/user-service"
 	"context"
 	"database/sql"
-	"log"
 	"sync"
-
-	"github.com/joho/godotenv"
 )
 
 var once sync.Once
@@ -21,11 +18,6 @@ type UserService struct {
 }
 
 func NewUserService(pc *sql.DB, cfg *config.MainConfig) *UserService {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-
 	var s *UserService
 	once.Do(func() {
 		s = &UserService{

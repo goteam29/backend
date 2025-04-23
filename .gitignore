@@ -6,4 +6,5 @@
 
 .env
 config/config.yml
+config/docker-config.yml
 storage
