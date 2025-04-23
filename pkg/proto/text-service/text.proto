@@ -65,15 +65,10 @@ service Text{
     };
   };
 
-  rpc AddSectionInSubject(AddSectionInSubjectRequest) returns (AddSectionInSubjectResponse){
+  rpc AssignSectionToSubject(AssignSectionToSubjectRequest) returns (AssignSectionToSubjectResponse){
     option (google.api.http) = {
       post: "/api/v0/section-subject"
       body: "*"
-    };
-  };
-  rpc RemoveSectionFromSubject(RemoveSectionFromSubjectRequest) returns (RemoveSectionFromSubjectResponse){
-    option (google.api.http) = {
-      delete: "/api/v0/section-subject"
     };
   };
 
@@ -297,19 +292,11 @@ message GetSubjectsResponse{
 }
 
 // Update
-message AddSectionInSubjectRequest{
+message AssignSectionToSubjectRequest{
   string id = 1;
   string section_id = 2;
 }
-message AddSectionInSubjectResponse{
-  string section_id = 1;
-}
-
-message RemoveSectionFromSubjectRequest{
-  string id = 1;
-  string section_id = 2;
-}
-message RemoveSectionFromSubjectResponse{
+message AssignSectionToSubjectResponse{
   string section_id = 1;
 }
 

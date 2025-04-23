@@ -155,7 +155,14 @@ func AddSubjectInClass(ctx context.Context, db *sql.DB, req *textService.AddSubj
 }
 
 func RemoveSubjectFromClass(ctx context.Context, db *sql.DB, req *textService.RemoveSubjectFromClassRequest) (*textService.RemoveSubjectFromClassResponse, error) {
-	_, err := db.ExecContext(ctx, "DELETE FROM classes_subjects WHERE class_id = $1 AND subject_id = $2", req.Id, req.SubjectId)
+	query := `
+		DELETE 
+		FROM classes_subjects 
+		WHERE class_id = $1 
+		AND subject_id = $2;
+	`
+
+	_, err := db.ExecContext(ctx, query, req.Id, req.SubjectId)
 	if err != nil {
 		return nil, fmt.Errorf("pgUpdateClass: failed to remove subject from classes_subjects: %w", err)
 	}
@@ -166,7 +173,12 @@ func RemoveSubjectFromClass(ctx context.Context, db *sql.DB, req *textService.Re
 }
 
 func DeleteClass(ctx context.Context, db *sql.DB, req *textService.DeleteClassRequest) (*textService.DeleteClassResponse, error) {
-	_, err := db.ExecContext(ctx, "DELETE FROM classes WHERE id = $1", req.Id)
+	query := `
+		DELETE 
+		FROM classes 
+		WHERE id = $1;
+	`
+	_, err := db.ExecContext(ctx, query, req.Id)
 	if err != nil {
 		return nil, fmt.Errorf("pgDeleteClass: failed to delete class in database: %w", err)
 	}
