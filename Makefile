@@ -36,3 +36,8 @@ build:
 
 run: generate_api build
 
+test:
+	go test -tags=test ./... -coverprofile=coverage.out
+
+coverage:
+	go tool cover -html=coverage.out
