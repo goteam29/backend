@@ -42,7 +42,7 @@ func main() {
 }
 
 func createUserServiceConnection(ctx context.Context, mux *runtime.ServeMux, cfg *config.MainConfig) {
-	conn, err := grpc.NewClient(fmt.Sprintf("localhost:%d", cfg.UserServicePort), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(fmt.Sprintf("user-service:%d", cfg.UserServicePort), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		utils.GetSugaredLogger().Fatalf("can't connect to user-service | err: %v", err)
 	}
@@ -54,7 +54,7 @@ func createUserServiceConnection(ctx context.Context, mux *runtime.ServeMux, cfg
 }
 
 func createTextServiceConnection(ctx context.Context, mux *runtime.ServeMux, cfg *config.MainConfig) {
-	conn, err := grpc.NewClient(fmt.Sprintf("localhost:%d", cfg.TextServicePort), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(fmt.Sprintf("text-service:%d", cfg.TextServicePort), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		utils.GetSugaredLogger().Fatalf("can't connect to text-service | err: %v", err)
 	}
@@ -66,7 +66,7 @@ func createTextServiceConnection(ctx context.Context, mux *runtime.ServeMux, cfg
 }
 
 func createFileServiceConnection(ctx context.Context, mux *runtime.ServeMux, cfg *config.MainConfig) {
-	conn, err := grpc.NewClient(fmt.Sprintf("localhost:%d", cfg.FileServicePort), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(fmt.Sprintf("file-service:%d", cfg.FileServicePort), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		utils.GetSugaredLogger().Fatalf("can' connect to file-service | err: %v", err)
 	}

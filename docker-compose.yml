@@ -129,6 +129,23 @@ services:
       - main-api-network
 
 
+  main-gateway:
+    container_name: uxedu-main-gateway_container
+    build:
+      context: .
+      dockerfile: internal/gateways/main-api-gateway/Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - main-api-network
+
+
 networks:
   main-api-network:
     driver: bridge
