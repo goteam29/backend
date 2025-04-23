@@ -10,7 +10,7 @@ Easily integrable into existing systems
 # 📑 Table of Contents
 
 - [📚 UxEdu: Scalable API for Modern Education Systems](#-uxedu-scalable-api-for-modern-education-systems)
-   - [🏳️ How to run the project](#️-how-to-run-the-project)
+   - [🏳️ How to run the project](#️how-to-run-the-project)
    - [🔧 Services Overview](#-services-overview)
    - [🧩 What Each Service Does](#-what-each-service-does)
    - [⚙️ Tech-Stack](#️-tech-stack)
