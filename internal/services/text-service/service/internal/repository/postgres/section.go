@@ -9,7 +9,7 @@ import (
 	"github.com/lib/pq"
 )
 
-func InsertSection(db *sql.Tx, req *textService.CreateSectionRequest) (*textService.CreateSectionResponse, error) {
+func InsertSection(db *sql.DB, req *textService.CreateSectionRequest) (*textService.CreateSectionResponse, error) {
 	id := uuid.New()
 
 	_, err := db.Exec("INSERT INTO sections (id, subject_id, name, description) VALUES ($1, $2, $3, $4)",
@@ -24,24 +24,50 @@ func InsertSection(db *sql.Tx, req *textService.CreateSectionRequest) (*textServ
 
 	return &textService.CreateSectionResponse{
 		Id: id.String(),
-	},nil
+	}, nil
 }
 
 func SelectSection(db *sql.DB, req *textService.GetSectionRequest) (*textService.GetSectionResponse, error) {
-	sectionResponse := &textService.GetSectionResponse{
-		Section: &textService.Section{
-			LessonIds: make([]string, 0),
-		},
-	}
+	query := `
+		SELECT 
+			s.id AS section_id,
+			s.subject_id AS subject_id,
+			s.name AS section_name,
+			s.description AS section_description,
+			array_agg(DISTINCT l.id) FILTER (WHERE l.id IS NOT NULL) AS lesson_ids
+		FROM
+			sections s
+		LEFT JOIN
+			lessons l on s.id = l.section_id
+		WHERE
+			s.id = $1
+		GROUP BY
+			s.id, s.subject_id, s.name, s.description;
+	`
 
-	section := db.QueryRow("SELECT id, subject_id, name, description, lesson_ids FROM sections WHERE id = ($1)", req.Id)
-	err := section.Scan(&sectionResponse.Section.Id, &sectionResponse.Section.SubjectId,
-		&sectionResponse.Section.Name, &sectionResponse.Section.Description, pq.Array(&sectionResponse.Section.LessonIds))
+	sectionRow := db.QueryRow(query, req.Id)
+
+	var (
+		id, subjectId, name, description string
+		lessonIds                        pq.StringArray
+	)
+
+	err := sectionRow.Scan(&id, &subjectId, &name, &description, &lessonIds)
 	if err != nil {
 		return nil, fmt.Errorf("pgSelectSection: failed to scan section: %v", err)
 	}
 
-	return sectionResponse, nil
+	section := &textService.Section{
+		Id:          id,
+		SubjectId:   subjectId,
+		Name:        name,
+		Description: description,
+		LessonIds:   lessonIds,
+	}
+
+	return &textService.GetSectionResponse{
+		Section: section,
+	}, nil
 }
 
 func SelectSections(db *sql.DB) (*textService.GetSectionsResponse, error) {
