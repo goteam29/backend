@@ -35,7 +35,8 @@ message RegisterRequest{
 
 message RegisterResponse{
     string uuid = 1; //use it for notifying user of successful creating account (EXAMPLE: message = "account registered successfully!")
-    bool isAdmin = 2;
+    string token = 2;
+    bool isAdmin = 3;
 }
 
 //login messages

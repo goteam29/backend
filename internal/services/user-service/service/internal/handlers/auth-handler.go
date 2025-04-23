@@ -58,8 +58,15 @@ func (ah *AuthHandler) Register(ctx context.Context, req *userservice.RegisterRe
 		}
 		return nil, status.Errorf(codes.Internal, "can't insert user into bd | err: %v", err)
 	}
+
+	token, err := ah.jwt.Generate(id, req.Email)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "can't generate jwt token | err %v", err)
+	}
+
 	return &userservice.RegisterResponse{
-		Uuid: id,
+		Token: token,
+		Uuid:  id,
 	}, nil
 }
 
