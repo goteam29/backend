@@ -28,6 +28,26 @@ Auth Service [3]	User authentication: registration and login
 Video Service [4]	Stream or upload/download videos using chunks (supports both gRPC and HTTP)
 ```
 
+## ⚙️ Tech-Stack
+
+1. *Database* <br/>
+   The main database of UxEdu is **PostgreSQL**. We're chosen postgres because of it speed, popularity and simplicity
+2. *Cashing* <br/>
+   We're using **Redis** to cash the items because of its fantastic speed, RAM-type data saving and also simplicity
+3. *Object storage* <br/>
+   Minio - our object storage. I have chosen it because of it popularity, low requirements and a large amount of documentation
+
+
+
+## 👍Our advantages
+
+1. Beautiful logging
+2. Reasonable distribution of services, as well as their division into two gateways
+3. Following the principles of clean architecture (CA)
+4. Convenient commands in Makefile
+
+
+
 # 🚀Main api gateway
 
 The base path of main-api-gateway is
@@ -113,6 +133,10 @@ curl -X POST http://localhost:8080/api/v0/file \
 curl "http://localhost:8080/api/v0/file?bucket_name=my-bucket&object_key=report.pdf"
 ```
 
+
+
+<br/>
+<br/>
 
 
 ## 📓Text Service
@@ -430,6 +454,10 @@ This document provides a detailed and structured reference for the **TextService
 ---
 
 
+<br/>
+<br/>
+<br/>
+
 # 👤User Service
 
 ## General Information
@@ -526,6 +554,8 @@ The base endpoint prefix is
 /video/v0
 ```
 
+
+<br/><br/><br/>
 
 ## 🎥Video Service
 
