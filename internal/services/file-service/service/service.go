@@ -3,8 +3,9 @@ package service
 import (
 	"api-repository/internal/config"
 	"api-repository/internal/services/file-service/service/internal/handlers"
-	fileminio "api-repository/pkg/db/file-minio"
+	minio2 "api-repository/pkg/db/minio"
 	"context"
+	"github.com/minio/minio-go/v7"
 	"log"
 	"net"
 	"strconv"
@@ -16,13 +17,13 @@ import (
 
 type FileService struct {
 	grpcServer  *grpc.Server
-	minioClient *fileminio.Client
+	minioClient *minio.Client
 }
 
 type fileServer struct {
 	pb.UnimplementedFileServer
 	fileHandler *handlers.FileHandler
-	minioClient *fileminio.Client
+	minioClient *minio.Client
 }
 
 func (s *fileServer) GetFile(ctx context.Context, req *pb.GetFileRequest) (*pb.GetFileResponse, error) {
@@ -30,17 +31,7 @@ func (s *fileServer) GetFile(ctx context.Context, req *pb.GetFileRequest) (*pb.G
 }
 
 func New(cfg *config.MainConfig) (*FileService, error) {
-	minioClient, err := fileminio.New(fileminio.MnConfig{
-		Endpoint:       "localhost:9000",
-		AccessKey:      "minioadmin",
-		SecretKey:      "minioadmin",
-		Region:         "us-east-1",
-		UseSSL:         false,
-		ForcePathStyle: true,
-	})
-	if err != nil {
-		return nil, err
-	}
+	minioClient := minio2.NewFileMinioConnection(cfg.MinIO)
 	fileHandler := handlers.NewFileHandler(minioClient)
 
 	grpcServer := grpc.NewServer()

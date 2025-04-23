@@ -9,7 +9,8 @@ import (
 )
 
 type MnConfig struct {
-	Endpoint       string `yaml:"MINIO_ENDPOINT" env:"MINIO_ENDPOINT" env-default:"localhost:9000"`
+	FileEndpoint   string `yaml:"MINIO_FILE_ENDPOINT" env:"MINIO_FILE_ENDPOINT" env-default:"localhost:9000"`
+	VideoEndpoint  string `yaml:"MINIO_VIDEO_ENDPOINT" env:"MINIO_VIDEO_ENDPOINT" env-default:"localhost:9002"`
 	AccessKey      string `yaml:"MINIO_ACCESS_KEY" env:"MINIO_ACCESS_KEY" env-default:"minioadmin"`
 	SecretKey      string `yaml:"MINIO_SECRET_KEY" env:"MINIO_SECRET_KEY" env-default:"minioadmin"`
 	Region         string `yaml:"MINIO_REGION" env:"MINIO_REGION" env-default:"us-east-1"`
@@ -17,17 +18,54 @@ type MnConfig struct {
 	ForcePathStyle bool   `yaml:"MINIO_FORCE_PATH_STYLE" env:"MINIO_FORCE_PATH_STYLE" env-default:"true"`
 }
 
+func CreateVideoMinioMockConfig() MnConfig {
+	return MnConfig{
+		VideoEndpoint:  "localhost:9002",
+		AccessKey:      "minioadmin",
+		SecretKey:      "minioadmin",
+		Region:         "us-east-1",
+		UseSSL:         false,
+		ForcePathStyle: true,
+	}
+}
+
+func CreateFileMinioMockConfig() MnConfig {
+	return MnConfig{
+		VideoEndpoint:  "localhost:9000",
+		AccessKey:      "minioadmin",
+		SecretKey:      "minioadmin",
+		Region:         "us-east-1",
+		UseSSL:         false,
+		ForcePathStyle: true,
+	}
+}
+
 func NewVideoMinioConnection(cfg MnConfig) *minio.Client {
-	client, err := minio.New(cfg.Endpoint, &minio.Options{
+	client, err := minio.New(cfg.VideoEndpoint, &minio.Options{
 		Creds:  credentials.NewStaticV4(cfg.AccessKey, cfg.SecretKey, ""),
 		Secure: false,
 	})
 	if err != nil {
-		utils.GetSugaredLogger().Fatalf("can't connect to minio | err: %v", err)
+		utils.GetSugaredLogger().Fatalf("can't connect to video-minio | err: %v", err)
 		return nil
 	}
 
 	createBucket(client, "videos")
+
+	return client
+}
+
+func NewFileMinioConnection(cfg MnConfig) *minio.Client {
+	client, err := minio.New(cfg.FileEndpoint, &minio.Options{
+		Creds:  credentials.NewStaticV4(cfg.AccessKey, cfg.SecretKey, ""),
+		Secure: false,
+	})
+	if err != nil {
+		utils.GetSugaredLogger().Fatalf("can't connect to file-minio | err: %v", err)
+		return nil
+	}
+
+	createBucket(client, "bucket")
 
 	return client
 }
