@@ -137,13 +137,28 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-
+      minio-default:
+        condition: service_healthy
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
     networks:
       - main-api-network
+
+  video-gateway:
+    container_name: uxedu-video-gateway_container
+    build:
+      context: .
+      dockerfile: internal/gateways/video-api-gateway/Dockerfile
+    ports:
+      - "8081:8081"
+    depends_on:
+      minio-video:
+        condition: service_healthy
+    networks:
+      - video-api-network
+
 
 
 networks:

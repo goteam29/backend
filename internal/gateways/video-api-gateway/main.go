@@ -36,7 +36,7 @@ func main() {
 }
 
 func createVideoServiceConnection(ctx context.Context, mux *runtime.ServeMux, cfg *config.MainConfig) {
-	conn, err := grpc.NewClient(fmt.Sprintf("localhost:%d", cfg.VideServicePort), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(fmt.Sprintf("video-service:%d", cfg.VideServicePort), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		utils.GetSugaredLogger().Fatalf("can't connect to video-service | err: %v", err)
 	}
