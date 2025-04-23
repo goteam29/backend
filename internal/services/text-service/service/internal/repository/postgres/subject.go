@@ -13,8 +13,25 @@ import (
 func InsertSubject(ctx context.Context, db *sql.DB, req *textService.CreateSubjectRequest) (*textService.CreateSubjectResponse, error) {
 	id := uuid.New()
 
-	_, err := db.Exec("INSERT INTO subjects (id, name) VALUES ($1, $2)",
-		id, req.Name)
+	query := `
+        WITH inserted_subject AS (
+            INSERT INTO public.subjects (id, name)
+            VALUES ($1, $2)
+            RETURNING id
+        )
+        INSERT INTO public.classes_subjects (class_id, subject_id)
+        SELECT
+            $3,
+            inserted_subject.id
+        FROM inserted_subject
+        WHERE EXISTS (
+            SELECT 1
+            FROM public.classes
+            WHERE id = $3
+        );
+	`
+
+	_, err := db.Exec(query, id, req.Name, req.ClassId)
 	if err != nil {
 		return nil, fmt.Errorf("pgInsertSubject: failed to insert subject into database: %v", err)
 	}
@@ -25,70 +42,116 @@ func InsertSubject(ctx context.Context, db *sql.DB, req *textService.CreateSubje
 }
 
 func SelectSubject(ctx context.Context, db *sql.DB, req *textService.GetSubjectRequest) (*textService.GetSubjectResponse, error) {
-	subjectResponse := &textService.GetSubjectResponse{
-		Subject: &textService.Subject{
-			SectionIds: make([]string, 0),
-		},
-	}
+	query := `
+		SELECT
+    		s.id AS subject_id,
+    		s.name AS subject_name,
+    		array_agg(DISTINCT cs.class_id) FILTER (WHERE cs.class_id IS NOT NULL) AS class_ids,
+    		array_agg(DISTINCT sec.id) FILTER (WHERE sec.id IS NOT NULL) AS section_ids
+		FROM
+    		public.subjects s
+		LEFT JOIN
+    		public.classes_subjects cs ON s.id = cs.subject_id
+		LEFT JOIN
+    		public.sections sec ON s.id = sec.subject_id
+		WHERE
+    		s.id = $1
+		GROUP BY
+    		s.id, s.name;
+	`
 
-	subject := db.QueryRow("SELECT id, name, class_id, section_ids FROM subjects WHERE id = ($1)", req.Id)
-	err := subject.Scan(&subjectResponse.Subject.Id, &subjectResponse.Subject.Name, &subjectResponse.Subject.ClassId, pq.Array(&subjectResponse.Subject.SectionIds))
+	subjectRow := db.QueryRow(query, req.Id)
+
+	var (
+		id, name, classId string
+		sectionIds        pq.StringArray
+	)
+
+	err := subjectRow.Scan(&id, &name, &classId, &sectionIds)
 	if err != nil {
-		return nil, fmt.Errorf("pgSelectSubject: failed to scan subject: %v", err)
+		return nil, fmt.Errorf("pgSelectSubject: failed to scan row: %v", err)
 	}
 
-	return subjectResponse, nil
-}
-
-func SelectSubjects(ctx context.Context, db *sql.DB) (*textService.GetSubjectsResponse, error) {
-	subjects, err := db.Query("SELECT id, name, class_id, section_ids FROM subjects")
-	if err != nil {
-		return nil, fmt.Errorf("pgSelectSubjects: failed to select subjects from database: %v", err)
-	}
-	defer subjects.Close()
-
-	subjectsResponse := make([]*textService.Subject, 0, 11)
-
-	for subjects.Next() {
-		subject := &textService.Subject{}
-		var sectionIds pq.StringArray
-
-		err := subjects.Scan(&subject.Id, &subject.Name, &subject.ClassId, &sectionIds)
-		if err != nil {
-			return nil, fmt.Errorf("pgSelectSubjectes: failed to scan rows: %v", err)
-		}
-
-		subject.SectionIds = sectionIds
-		subjectsResponse = append(subjectsResponse, subject)
+	subject := &textService.Subject{
+		Id:         id,
+		Name:       name,
+		ClassId:    classId,
+		SectionIds: sectionIds,
 	}
 
-	if err := subjects.Err(); err != nil {
-		return nil, fmt.Errorf("pgSelectSubjectes: error during rows iteration: %v", err)
-	}
-
-	return &textService.GetSubjectsResponse{
-		Subjects: subjectsResponse,
+	return &textService.GetSubjectResponse{
+		Subject: subject,
 	}, nil
 }
 
-func AddSectionInSubject(ctx context.Context, db *sql.Tx, req *textService.AddSectionInSubjectRequest) (*textService.AddSectionInSubjectResponse, error) {
-	_, err := db.Exec("UPDATE subjects SET section_ids = array_append(section_ids, $1) WHERE id = $2", req.SectionId, req.Id)
+func SelectSubjects(ctx context.Context, db *sql.DB) (*textService.GetSubjectsResponse, error) {
+	subjects := make([]*textService.Subject, 0, 10)
+
+	query := `
+		SELECT
+    		s.id AS subject_id,
+    		s.name AS subject_name,
+    		array_agg(DISTINCT cs.class_id) FILTER (WHERE cs.class_id IS NOT NULL) AS class_ids,
+    		array_agg(DISTINCT sec.id) FILTER (WHERE sec.id IS NOT NULL) AS section_ids
+		FROM
+    		public.subjects s
+		LEFT JOIN
+    		public.classes_subjects cs ON s.id = cs.subject_id
+		LEFT JOIN
+    		public.sections sec ON s.id = sec.subject_id
+		GROUP BY
+    		s.id, s.name;
+	`
+
+	subjectRows, err := db.Query(query)
+	if err != nil {
+		return nil, fmt.Errorf("pgSelectSubjects: failed to query subjects: %v", err)
+	}
+	defer subjectRows.Close()
+
+	for subjectRows.Next() {
+		var (
+			Id, Name, ClassId string
+			SectionIds        pq.StringArray
+		)
+
+		err := subjectRows.Scan(&Id, &Name, &ClassId, &SectionIds)
+		if err != nil {
+			return nil, fmt.Errorf("pgSelectSubjects: failed to scan row: %v", err)
+		}
+
+		subject := &textService.Subject{
+			Id:         Id,
+			Name:       Name,
+			ClassId:    ClassId,
+			SectionIds: SectionIds,
+		}
+
+		subjects = append(subjects, subject)
+	}
+
+	if err := subjectRows.Err(); err != nil {
+		return nil, fmt.Errorf("pgSelectSubjects: error iterating over rows: %v", err)
+	}
+
+	return &textService.GetSubjectsResponse{
+		Subjects: subjects,
+	}, nil
+}
+
+func UpdateSubject(ctx context.Context, db *sql.DB, req *textService.AssignSectionToSubjectRequest) (*textService.AssignSectionToSubjectResponse, error) {
+	query := `
+		UPDATE sections
+		SET subject_id = $1
+		WHERE id = $2;
+	`
+
+	_, err := db.Exec(query, req.Id, req.SectionId)
 	if err != nil {
 		return nil, fmt.Errorf("pgUpdateSubject: failed to add section in subject: %v", err)
 	}
 
-	return &textService.AddSectionInSubjectResponse{
-		SectionId: req.SectionId,
-	}, nil
-}
-
-func RemoveSectionFromSubject(ctx context.Context, db *sql.DB, req *textService.RemoveSectionFromSubjectRequest) (*textService.RemoveSectionFromSubjectResponse, error) {
-	_, err := db.Exec("UPDATE subjects SET section_ids = array_remove(section_ids, $1) WHERE id = $2", req.SectionId, req.Id)
-	if err != nil {
-		return nil, fmt.Errorf("pgUpdateSubject: failed to remove section in subject: %v", err)
-	}
-
-	return &textService.RemoveSectionFromSubjectResponse{
+	return &textService.AssignSectionToSubjectResponse{
 		SectionId: req.SectionId,
 	}, nil
 }
