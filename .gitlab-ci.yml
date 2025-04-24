@@ -8,10 +8,9 @@ stages:
   - build
 
 .build-template: &build-template
-  stage: build
-  image: docker:24.0
+  image: docker
   services:
-    - docker:24.0-dind
+    - docker:dind
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN $CI_REGISTRY
   script:
@@ -30,6 +29,7 @@ stages:
         .
 
 build-docker-images:
+  stage: build
   parallel:
     matrix:
       - FILE: internal/services/video-service/Dockerfile
@@ -47,7 +47,3 @@ build-docker-images:
   variables:
     IMAGE_NAME: "${IMAGE_BASE}/${SUFFIX}"
   <<: *build-template
-
-# Optional: Add rules to ignore specific paths
-# Note: GitLab doesn't support exclude patterns in rules:changes directly
-# You might need to implement custom logic if path filtering is critical
