@@ -15,6 +15,7 @@ stages:
   variables:
     GOOS: linux
     GOARCH: amd64
+    GOPATH: "/go"
   before_script:
     - apk update
     - apk add --no-cache make protobuf-dev git
@@ -28,24 +29,21 @@ stages:
     - make generate_api
   artifacts:
     paths:
-      - go.sum
-      - go.mod
-      - api/
+      - .
     expire_in: 1 hour
 
 pre-build:
   <<: *preparation-template
+  # Always run regardless of changes
   rules:
-    - changes:
-        - "**/*.go"
-        - "go.mod"
-        - "api/**/*.proto"
-        - Makefile
+    - if: $CI_PIPELINE_SOURCE  # Remove file-based conditions
 
 .build-template: &build-template
   image: docker
   services:
     - docker:dind
+  stage: build
+  needs: ["pre-build"]  # Requires the preparation job
   before_script:
     - docker context create builder --docker "host=tcp://docker:2376,ca=/certs/client/ca.pem,cert=/certs/client/cert.pem,key=/certs/client/key.pem"
     - unset DOCKER_HOST
@@ -68,8 +66,6 @@ pre-build:
         .
 
 build-docker-images:
-  stage: build
-  needs: ["pre-build"]
   parallel:
     matrix:
       - FILE: internal/services/video-service/Dockerfile
