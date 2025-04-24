@@ -4,6 +4,7 @@ variables:
   REGISTRY: $CI_REGISTRY
   IMAGE_BASE: $CI_REGISTRY_IMAGE
 
+
 stages:
   - preparation
   - build

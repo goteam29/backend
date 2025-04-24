@@ -20,7 +20,7 @@ func main() {
 
 	fileService, err := service.New(cfg)
 	if err != nil {
-		log.Fatalf("Service initialization failed: %v", err)
+		log.Fatalf("Service ⚙️⚙️⚙️⚙️⚙️⚙️⚙️ initialization failed: %v", err)
 	}
 
 	if err := fileService.Start(cfg.FileServicePort); err != nil {
