@@ -1,9 +1,8 @@
 variables:
-  DOCKER_HOST: tcp://docker:2376
+  DOCKER_HOST: tcp://docker:2375
   DOCKER_BUILDKIT: 1
   REGISTRY: $CI_REGISTRY
   IMAGE_BASE: $CI_REGISTRY_IMAGE
-
 
 stages:
   - preparation
@@ -37,24 +36,20 @@ stages:
 
 pre-build:
   <<: *preparation-template
-  # Always run regardless of changes
   rules:
-    - if: $CI_PIPELINE_SOURCE  # Remove file-based conditions
+    - if: $CI_PIPELINE_SOURCE
 
 .build-template: &build-template
-  image: docker
+  image: docker:latest
   services:
     - docker:dind
   stage: build
-  needs: ["pre-build"]  # Requires the preparation job
+  needs: ["pre-build"]
   before_script:
-    - unset DOCKER_HOST
-    - docker context use builder
-    - docker buildx create builder --use
     - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN $CI_REGISTRY
+    - docker buildx create --use
   script:
     - |
-      docker buildx create --use
       TAGS="--tag $IMAGE_NAME:${CI_COMMIT_REF_SLUG} --tag $IMAGE_NAME:${CI_COMMIT_SHORT_SHA}"
       if [ "$CI_COMMIT_BRANCH" = "$CI_DEFAULT_BRANCH" ]; then
         TAGS="$TAGS --tag $IMAGE_NAME:latest"
