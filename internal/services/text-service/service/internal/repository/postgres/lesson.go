@@ -69,7 +69,7 @@ func SelectLesson(pg *sql.DB, req *textService.GetLessonRequest) (*textService.G
 		return nil, fmt.Errorf("pgSelectLesson: failed to scan lesson: %v", err)
 	}
 
-	lesson:=&textService.Lesson{
+	lesson := &textService.Lesson{
 		Id:          id,
 		SectionId:   sectionId,
 		Name:        name,
@@ -87,7 +87,7 @@ func SelectLesson(pg *sql.DB, req *textService.GetLessonRequest) (*textService.G
 }
 
 func SelectLessons(pg *sql.DB) (*textService.GetLessonsResponse, error) {
-	lessons:=make([]*textService.Lesson, 0,10)
+	lessons := make([]*textService.Lesson, 0, 10)
 
 	query := `
 		SELECT
@@ -158,7 +158,13 @@ func SelectLessons(pg *sql.DB) (*textService.GetLessonsResponse, error) {
 }
 
 func AddVideoInLesson(pg *sql.DB, req *textService.AddVideoInLessonRequest) (*textService.AddVideoInLessonResponse, error) {
-	_, err := pg.Exec("UPDATE lessons SET video_ids = array_append(video_ids, $1) WHERE id = $2", req.VideoId, req.Id)
+	query := `
+		UPDATE videos
+		SET lesson_id = $1
+		WHERE id = $2
+	`
+
+	_, err := pg.Exec(query, req.Id, req.VideoId)
 	if err != nil {
 		return nil, fmt.Errorf("pgAddVideoInLesson: failed to add video in lesson: %v", err)
 	}
@@ -169,7 +175,13 @@ func AddVideoInLesson(pg *sql.DB, req *textService.AddVideoInLessonRequest) (*te
 }
 
 func AddFileInLesson(pg *sql.DB, req *textService.AddFileInLessonRequest) (*textService.AddFileInLessonResponse, error) {
-	_, err := pg.Exec("UPDATE lessons SET file_ids = array_append(file_ids, $1) WHERE id = $2", req.FileId, req.Id)
+	query := `
+		UPDATE files
+		SET lesson_id = $1
+		WHERE id = $2
+	`
+
+	_, err := pg.Exec(query, req.Id, req.FileId)
 	if err != nil {
 		return nil, fmt.Errorf("pgAddFileInLesson: failed to add file in lesson: %v", err)
 	}
@@ -180,7 +192,13 @@ func AddFileInLesson(pg *sql.DB, req *textService.AddFileInLessonRequest) (*text
 }
 
 func AddExerciseInLesson(pg *sql.DB, req *textService.AddExerciseInLessonRequest) (*textService.AddExerciseInLessonResponse, error) {
-	_, err := pg.Exec("UPDATE lessons SET exercise_ids = array_append(exercise_ids, $1) WHERE id = $2", req.ExerciseId, req.Id)
+	query := `
+		UPDATE exercises
+		SET lesson_id = $1
+		WHERE id = $2
+	`
+
+	_, err := pg.Exec(query, req.Id, req.ExerciseId)
 	if err != nil {
 		return nil, fmt.Errorf("pgAddExerciseInLesson: failed to add exercise in lesson: %v", err)
 	}
@@ -191,7 +209,13 @@ func AddExerciseInLesson(pg *sql.DB, req *textService.AddExerciseInLessonRequest
 }
 
 func AddCommentInLesson(pg *sql.DB, req *textService.AddCommentInLessonRequest) (*textService.AddCommentInLessonResponse, error) {
-	_, err := pg.Exec("UPDATE lessons SET comment_ids = array_append(comment_ids, $1) WHERE id = $2", req.CommentId, req.Id)
+	query := `
+		UPDATE comments
+		SET lesson_id = $1
+		WHERE id = $2
+	`
+
+	_, err := pg.Exec(query, req.Id, req.CommentId)
 	if err != nil {
 		return nil, fmt.Errorf("pgAddCommentInLesson: failed to add comment in lesson: %v", err)
 	}
