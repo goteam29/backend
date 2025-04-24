@@ -6,7 +6,41 @@ variables:
   IMAGE_BASE: $CI_REGISTRY_IMAGE
 
 stages:
+  - preparation
   - build
+
+.preparation-template: &preparation-template
+  image: golang:1.24-alpine
+  stage: preparation
+  variables:
+    GOOS: linux
+    GOARCH: amd64
+  before_script:
+    - apk update
+    - apk add --no-cache make protobuf-dev git
+  script:
+    - go mod tidy
+    - go fmt ./...
+    - go mod download
+    - go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+    - go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+    - export PATH="$PATH:$(go env GOPATH)/bin"
+    - make generate_api
+  artifacts:
+    paths:
+      - go.sum
+      - go.mod
+      - api/
+    expire_in: 1 hour
+
+pre-build:
+  <<: *preparation-template
+  rules:
+    - changes:
+        - "**/*.go"
+        - "go.mod"
+        - "api/**/*.proto"
+        - Makefile
 
 .build-template: &build-template
   image: docker
@@ -35,6 +69,7 @@ stages:
 
 build-docker-images:
   stage: build
+  needs: ["preparation"]
   parallel:
     matrix:
       - FILE: internal/services/video-service/Dockerfile
