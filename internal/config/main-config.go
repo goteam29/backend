@@ -24,7 +24,7 @@ type MainConfig struct {
 func NewMainConfig() (*MainConfig, error) {
 	var cfg MainConfig
 
-	if err := cleanenv.ReadConfig("config/config.yml", &cfg); err != nil {
+	if err := cleanenv.ReadConfig("config/docker-config.yml", &cfg); err != nil {
 		return nil, err
 	}
 	return &cfg, nil

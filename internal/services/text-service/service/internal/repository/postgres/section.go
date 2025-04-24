@@ -71,55 +71,73 @@ func SelectSection(db *sql.DB, req *textService.GetSectionRequest) (*textService
 }
 
 func SelectSections(db *sql.DB) (*textService.GetSectionsResponse, error) {
-	sections, err := db.Query("SELECT id, subject_id, name, description, lesson_ids FROM sections")
+	sections := make([]*textService.Section, 0, 10)
+
+	query := `
+		SELECT 
+			s.id AS section_id,
+			s.subject_id AS subject_id,
+			s.name AS section_name,
+			s.description AS section_description,
+			array_agg(DISTINCT l.id) FILTER (WHERE l.id IS NOT NULL) AS lesson_ids
+		FROM
+			sections s
+		LEFT JOIN
+			lessons l on s.id = l.section_id
+		GROUP BY
+			s.id, s.subject_id, s.name, s.description;
+	`
+
+	sectionRows, err := db.Query(query)
 	if err != nil {
-		return nil, fmt.Errorf("pgSelectSections: failed to select sections from database: %v", err)
+		return nil, fmt.Errorf("pgSelectSections: failed to query sections: %v", err)
 	}
-	defer sections.Close()
+	defer sectionRows.Close()
 
-	sectionsResponse := make([]*textService.Section, 0, 5)
+	for sectionRows.Next() {
+		var (
+			id, subjectId, name, description string
+			lessonIds                        pq.StringArray
+		)
 
-	for sections.Next() {
-		section := &textService.Section{}
-		var lessonIds pq.StringArray
-
-		err := sections.Scan(&section.Id, &section.SubjectId, &section.Name, &section.Description, &lessonIds)
+		err := sectionRows.Scan(&id, &subjectId, &name, &description, &lessonIds)
 		if err != nil {
-			return nil, fmt.Errorf("pgSelectSections: failed to scan rows: %v", err)
+			return nil, fmt.Errorf("pgSelectSections: failed to scan section: %v", err)
 		}
 
-		section.LessonIds = lessonIds
+		section := &textService.Section{
+			Id:          id,
+			SubjectId:   subjectId,
+			Name:        name,
+			Description: description,
+			LessonIds:   lessonIds,
+		}
 
-		sectionsResponse = append(sectionsResponse, section)
+		sections = append(sections, section)
 	}
 
-	if err := sections.Err(); err != nil {
-		return nil, fmt.Errorf("pgSelectSections: error during rows iteration: %v", err)
+	if err := sectionRows.Err(); err != nil {
+		return nil, fmt.Errorf("pgSelectSections: failed to iterate over sections: %v", err)
 	}
 
 	return &textService.GetSectionsResponse{
-		Sections: sectionsResponse,
+		Sections: sections,
 	}, nil
 }
 
-func AddLessonInSection(db *sql.DB, req *textService.AddLessonInSectionRequest) (*textService.AddLessonInSectionResponse, error) {
-	_, err := db.Exec("UPDATE sections SET lesson_ids = array_append(lesson_ids, $1) WHERE id = $2", req.LessonId, req.Id)
+func UpdateSection(db *sql.DB, req *textService.AssignLessonToSectionRequest) (*textService.AssignLessonToSectionResponse, error) {
+	query:= `
+		UPDATE lessons
+		SET section_id = $1
+		WHERE id = $2;
+	`
+	
+	_, err := db.Exec(query, req.Id, req.LessonId)
 	if err != nil {
 		return nil, fmt.Errorf("pgAddLessonsInSection: failed to add lesson in section: %v", err)
 	}
 
-	return &textService.AddLessonInSectionResponse{
-		LessonId: req.LessonId,
-	}, nil
-}
-
-func RemoveLessonFromSection(db *sql.DB, req *textService.RemoveLessonFromSectionRequest) (*textService.RemoveLessonFromSectionResponse, error) {
-	_, err := db.Exec("UPDATE sections SET lesson_ids = array_remove(lesson_ids, $1) WHERE id = $2", req.LessonId, req.Id)
-	if err != nil {
-		return nil, fmt.Errorf("pgRemoveLessonsFromSection: failed to remove lessons from section: %v", err)
-	}
-
-	return &textService.RemoveLessonFromSectionResponse{
+	return &textService.AssignLessonToSectionResponse{
 		LessonId: req.LessonId,
 	}, nil
 }

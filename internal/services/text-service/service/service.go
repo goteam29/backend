@@ -94,12 +94,8 @@ func (ts *TextService) GetSections(ctx context.Context, request *textService.Get
 	return ts.textHandler.GetSections(ctx)
 }
 
-func (ts *TextService) AddLessonInSection(ctx context.Context, request *textService.AddLessonInSectionRequest) (*textService.AddLessonInSectionResponse, error) {
-	return ts.textHandler.AddLessonInSection(ctx, request)
-}
-
-func (ts *TextService) RemoveLessonFromSection(ctx context.Context, request *textService.RemoveLessonFromSectionRequest) (*textService.RemoveLessonFromSectionResponse, error) {
-	return ts.textHandler.RemoveLessonFromSection(ctx, request)
+func (ts *TextService) AssignLessonToSection(ctx context.Context, request *textService.AssignLessonToSectionRequest) (*textService.AssignLessonToSectionResponse, error) {
+	return ts.textHandler.AssignLessonToSection(ctx, request)
 }
 
 func (ts *TextService) DeleteSection(ctx context.Context, request *textService.DeleteSectionRequest) (*textService.DeleteSectionResponse, error) {
@@ -125,36 +121,24 @@ func (ts *TextService) AddVideoInLesson(ctx context.Context, request *textServic
 	return ts.textHandler.AddVideoInLesson(ctx, request)
 }
 
-func (ts *TextService) RemoveVideoFromLesson(ctx context.Context, request *textService.RemoveVideoFromLessonRequest) (*textService.RemoveVideoFromLessonResponse, error) {
-	return ts.textHandler.RemoveVideoFromLesson(ctx, request)
-}
-
 func (ts *TextService) AddFileInLesson(ctx context.Context, request *textService.AddFileInLessonRequest) (*textService.AddFileInLessonResponse, error) {
 	return ts.textHandler.AddFileInLesson(ctx, request)
-}
-
-func (ts *TextService) RemoveFileFromLesson(ctx context.Context, request *textService.RemoveFileFromLessonRequest) (*textService.RemoveFileFromLessonResponse, error) {
-	return ts.textHandler.RemoveFileFromLesson(ctx, request)
 }
 
 func (ts *TextService) AddExerciseInLesson(ctx context.Context, request *textService.AddExerciseInLessonRequest) (*textService.AddExerciseInLessonResponse, error) {
 	return ts.textHandler.AddExerciseInLesson(ctx, request)
 }
 
-func (ts *TextService) RemoveExerciseFromLesson(ctx context.Context, request *textService.RemoveExerciseFromLessonRequest) (*textService.RemoveExerciseFromLessonResponse, error) {
-	return ts.textHandler.RemoveExerciseFromLesson(ctx, request)
-}
-
 func (ts *TextService) AddCommentInLesson(ctx context.Context, request *textService.AddCommentInLessonRequest) (*textService.AddCommentInLessonResponse, error) {
 	return ts.textHandler.AddCommentInLesson(ctx, request)
 }
 
-func (ts *TextService) RemoveCommentFromLesson(ctx context.Context, request *textService.RemoveCommentFromLessonRequest) (*textService.RemoveCommentFromLessonResponse, error) {
-	return ts.textHandler.RemoveCommentFromLesson(ctx, request)
-}
-
 func (ts *TextService) IncreaseRating(ctx context.Context, request *textService.IncreaseRatingRequest) (*textService.IncreaseRatingResponse, error) {
 	return ts.textHandler.IncreaseRating(ctx, request)
+}
+
+func (ts *TextService) DecreaseRating(ctx context.Context, request *textService.DecreaseRatingRequest) (*textService.DecreaseRatingResponse, error) {
+	return ts.textHandler.DecreaseRating(ctx, request)
 }
 
 func (ts *TextService) DeleteLesson(ctx context.Context, request *textService.DeleteLessonRequest) (*textService.DeleteLessonResponse, error) {

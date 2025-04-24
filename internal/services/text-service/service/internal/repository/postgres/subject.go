@@ -111,20 +111,20 @@ func SelectSubjects(ctx context.Context, db *sql.DB) (*textService.GetSubjectsRe
 
 	for subjectRows.Next() {
 		var (
-			Id, Name, ClassId string
-			SectionIds        pq.StringArray
+			id, name, classId string
+			sectionIds        pq.StringArray
 		)
 
-		err := subjectRows.Scan(&Id, &Name, &ClassId, &SectionIds)
+		err := subjectRows.Scan(&id, &name, &classId, &sectionIds)
 		if err != nil {
 			return nil, fmt.Errorf("pgSelectSubjects: failed to scan row: %v", err)
 		}
 
 		subject := &textService.Subject{
-			Id:         Id,
-			Name:       Name,
-			ClassId:    ClassId,
-			SectionIds: SectionIds,
+			Id:         id,
+			Name:       name,
+			ClassId:    classId,
+			SectionIds: sectionIds,
 		}
 
 		subjects = append(subjects, subject)

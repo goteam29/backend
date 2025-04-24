@@ -1,0 +1,53 @@
+variables:
+  DOCKER_TLS_CERTDIR: "/certs"
+  DOCKER_BUILDKIT: 1
+  REGISTRY: $CI_REGISTRY
+  IMAGE_BASE: $CI_REGISTRY_IMAGE
+
+stages:
+  - build
+
+.build-template: &build-template
+  stage: build
+  image: docker:24.0
+  services:
+    - docker:24.0-dind
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN $CI_REGISTRY
+  script:
+    - |
+      docker buildx create --use
+      TAGS="--tag $IMAGE_NAME:${CI_COMMIT_REF_SLUG} --tag $IMAGE_NAME:${CI_COMMIT_SHORT_SHA}"
+      if [ "$CI_COMMIT_BRANCH" = "$CI_DEFAULT_BRANCH" ]; then
+        TAGS="$TAGS --tag $IMAGE_NAME:latest"
+      fi
+      docker buildx build \
+        --file $FILE \
+        $TAGS \
+        --push \
+        --cache-from type=registry,ref=$IMAGE_NAME:buildcache \
+        --cache-to type=registry,ref=$IMAGE_NAME:buildcache,mode=max \
+        .
+
+build-docker-images:
+  parallel:
+    matrix:
+      - FILE: internal/services/video-service/Dockerfile
+        SUFFIX: video
+      - FILE: internal/services/text-service/Dockerfile
+        SUFFIX: text
+      - FILE: internal/services/user-service/Dockerfile
+        SUFFIX: user
+      - FILE: internal/services/file-service/Dockerfile
+        SUFFIX: file
+      - FILE: internal/gateways/main-api-gateway/Dockerfile
+        SUFFIX: main-gateway
+      - FILE: internal/gateways/video-api-gateway/Dockerfile
+        SUFFIX: video-gateway
+  variables:
+    IMAGE_NAME: "${IMAGE_BASE}/${SUFFIX}"
+  <<: *build-template
+
+# Optional: Add rules to ignore specific paths
+# Note: GitLab doesn't support exclude patterns in rules:changes directly
+# You might need to implement custom logic if path filtering is critical
