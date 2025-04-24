@@ -13,7 +13,7 @@ stages:
   services:
     - docker:dind
   before_script:
-    - docker context create builder --docker "host=tcp://docker:2376,tlsverify=true,cacert=/certs/client/ca.pem,cert=/certs/client/cert.pem,key=/certs/client/key.pem"
+    - docker context create builder --docker "host=tcp://docker:2376,ca=/certs/client/ca.pem,cert=/certs/client/cert.pem,key=/certs/client/key.pem"
     - unset DOCKER_HOST
     - docker context use builder
     - docker buildx create builder --use
