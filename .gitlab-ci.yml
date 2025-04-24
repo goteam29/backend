@@ -1,6 +1,6 @@
 variables:
-  DOCKER_HOST: tcp://docker:2376
-  DOCKER_TLS_CERTDIR: "/certs"
+  DOCKER_HOST: tcp://docker:2375
+#  DOCKER_TLS_CERTDIR: "/certs"
   DOCKER_BUILDKIT: 1
   REGISTRY: $CI_REGISTRY
   IMAGE_BASE: $CI_REGISTRY_IMAGE
@@ -48,7 +48,7 @@ pre-build:
   stage: build
   needs: ["pre-build"]  # Requires the preparation job
   before_script:
-    - docker context create builder --docker "host=tcp://docker:2376,ca=/certs/client/ca.pem,cert=/certs/client/cert.pem,key=/certs/client/key.pem"
+    - #docker context create builder --docker "host=tcp://docker:2375,ca=/certs/client/ca.pem,cert=/certs/client/cert.pem,key=/certs/client/key.pem"
     - unset DOCKER_HOST
     - docker context use builder
     - docker buildx create builder --use
