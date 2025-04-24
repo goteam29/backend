@@ -1,3 +1,13 @@
+
+# Пожалуйста, проверьте вечером (если кто-то смотрит 24 апреля) Мне совсем чуть чуть осталось 
+
+# Пожалуйста, проверьте вечером (если кто-то смотрит 24 апреля) Мне совсем чуть чуть осталось
+
+# Пожалуйста, проверьте вечером (если кто-то смотрит 24 апреля) Мне совсем чуть чуть осталось
+
+
+
+
 # 📚 UxEdu: Scalable API for Modern Education Systems
 UxEdu is a modular, distributed API designed to support a wide range of educational platforms. It provides ready-to-use templates, yet remains fully customizable to meet specific institutional or personal needs.
 
@@ -15,7 +25,7 @@ Easily integrable into existing systems
    - [🧩 What Each Service Does](#-what-each-service-does)
    - [⚙️ Tech-Stack](#️-tech-stack)
    - [👍Our advantages](#our-advantages)
-- [🚀 Main API Gateway](#rocketmain-api-gateway)
+- [🚀 Main API Gateway](#main-api-gateway)
    - [📁 File Service API](#-file-service-api)
       - [`GetFile`](#-getfile)
       - [`SetFile`](#-setfile)
