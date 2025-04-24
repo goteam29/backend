@@ -98,15 +98,10 @@ service Text{
     };
   };
 
-  rpc AddLessonInSection(AddLessonInSectionRequest) returns (AddLessonInSectionResponse){
+  rpc AssignLessonToSection(AssignLessonToSectionRequest) returns (AssignLessonToSectionResponse){
     option (google.api.http) = {
       post: "/api/v0/section-lesson"
       body: "*"
-    };
-  };
-  rpc RemoveLessonFromSection(RemoveLessonFromSectionRequest) returns (RemoveLessonFromSectionResponse){
-    option (google.api.http) = {
-      delete: "/api/v0/section-lesson"
     };
   };
 
@@ -133,55 +128,6 @@ service Text{
   rpc GetLessons(GetLessonsRequest) returns (GetLessonsResponse){
     option (google.api.http) = {
       get: "/api/v0/lessons"
-    };
-  };
-
-  rpc AddVideoInLesson(AddVideoInLessonRequest) returns (AddVideoInLessonResponse){
-    option (google.api.http) = {
-      post: "/api/v0/lesson-video"
-      body: "*"
-    };
-  };
-  rpc RemoveVideoFromLesson(RemoveVideoFromLessonRequest) returns (RemoveVideoFromLessonResponse){
-    option (google.api.http) = {
-      delete: "/api/v0/lesson-video"
-    };
-  };
-
-  rpc AddFileInLesson(AddFileInLessonRequest) returns (AddFileInLessonResponse){
-    option (google.api.http) = {
-      post: "/api/v0/lesson-file"
-      body: "*"
-    };
-  };
-  rpc RemoveFileFromLesson(RemoveFileFromLessonRequest) returns (RemoveFileFromLessonResponse){
-    option (google.api.http) = {
-      delete: "/api/v0/lesson-file"
-
-    };
-  };
-
-  rpc AddExerciseInLesson(AddExerciseInLessonRequest) returns (AddExerciseInLessonResponse){
-    option (google.api.http) = {
-      post: "/api/v0/lesson-exercise"
-      body: "*"
-    };
-  };
-  rpc RemoveExerciseFromLesson(RemoveExerciseFromLessonRequest) returns (RemoveExerciseFromLessonResponse){
-    option (google.api.http) = {
-      delete: "/api/v0/lesson-exercise"
-    };
-  };
-
-  rpc AddCommentInLesson(AddCommentInLessonRequest) returns (AddCommentInLessonResponse){
-    option (google.api.http) = {
-      post: "/api/v0/lesson-comment"
-      body: "*"
-    };
-  };
-  rpc RemoveCommentFromLesson(RemoveCommentFromLessonRequest) returns (RemoveCommentFromLessonResponse){
-    option (google.api.http) = {
-      delete: "/api/v0/lesson-comment"
     };
   };
 
@@ -342,21 +288,12 @@ message GetSectionsResponse{
   repeated Section sections = 1;
 }
 
-message AddLessonInSectionRequest{
+message AssignLessonToSectionRequest{
   string id = 1;
   string lesson_id = 2;
 }
 
-message AddLessonInSectionResponse{
-  string lesson_id = 1;
-}
-
-message RemoveLessonFromSectionRequest{
-  string id = 1;
-  string lesson_id = 2;
-}
-
-message RemoveLessonFromSectionResponse{
+message AssignLessonToSectionResponse{
   string lesson_id = 1;
 }
 
@@ -402,70 +339,6 @@ message GetLessonResponse{
 message GetLessonsRequest{}
 message GetLessonsResponse{
   repeated Lesson lessons = 1;
-}
-
-message AddVideoInLessonRequest{
-  string id = 1;
-  string video_id = 2;
-}
-message AddVideoInLessonResponse{
-  string video_id = 1;
-}
-
-message RemoveVideoFromLessonRequest{
-  string id = 1;
-  string video_id = 2;
-}
-message RemoveVideoFromLessonResponse{
-  string video_id = 1;
-}
-
-message AddFileInLessonRequest{
-  string id = 1;
-  string file_id = 2;
-}
-message AddFileInLessonResponse{
-  string file_id = 1;
-}
-
-message RemoveFileFromLessonRequest{
-  string id = 1;
-  string file_id = 2;
-}
-message RemoveFileFromLessonResponse{
-  string file_id = 1;
-}
-
-message AddExerciseInLessonRequest{
-  string id = 1;
-  string exercise_id = 2;
-}
-message AddExerciseInLessonResponse{
-  string exercise_id = 1;
-}
-
-message RemoveExerciseFromLessonRequest{
-  string id = 1;
-  string exercise_id = 2;
-}
-message RemoveExerciseFromLessonResponse{
-  string exercise_id = 1;
-}
-
-message AddCommentInLessonRequest{
-  string id = 1;
-  string comment_id = 2;
-}
-message AddCommentInLessonResponse{
-  string comment_id = 1;
-}
-
-message RemoveCommentFromLessonRequest{
-  string id = 1;
-  string comment_id = 2;
-}
-message RemoveCommentFromLessonResponse{
-  string comment_id = 1;
 }
 
 message IncreaseRatingRequest{

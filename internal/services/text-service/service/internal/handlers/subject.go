@@ -34,20 +34,20 @@ func (th *TextHandler) GetSubjects(ctx context.Context) (*textService.GetSubject
 	return subjects, nil
 }
 
-//func (th *TextHandler) AssignSectionToSubject(ctx context.Context, req *textService.AssignSectionToSubjectRequest) (*textService.AssignSectionToSubjectResponse, error) {
-//	sectionId, err := postgresRepo.UpdateSubject(ctx, th.pg, req)
-//	if err != nil {
-//		return nil, fmt.Errorf("updateSubject: %v", err)
-//	}
-//
-//	return sectionId, nil
-//}
-//
-//func (th *TextHandler) DeleteSubject(ctx context.Context, req *textService.DeleteSubjectRequest) (*textService.DeleteSubjectResponse, error) {
-//	id, err := postgresRepo.DeleteSubject(ctx, th.pg, req)
-//	if err != nil {
-//		return nil, fmt.Errorf("deleteSubject: %v", err)
-//	}
-//
-//	return id, nil
-//}
+func (th *TextHandler) AssignSectionToSubject(ctx context.Context, req *textService.AssignSectionToSubjectRequest) (*textService.AssignSectionToSubjectResponse, error) {
+	sectionId, err := postgresRepo.UpdateSubject(ctx, th.pg, req)
+	if err != nil {
+		return nil, fmt.Errorf("updateSubject: %v", err)
+	}
+
+	return sectionId, nil
+}
+
+func (th *TextHandler) DeleteSubject(ctx context.Context, req *textService.DeleteSubjectRequest) (*textService.DeleteSubjectResponse, error) {
+	id, err := postgresRepo.DeleteSubject(ctx, th.pg, req)
+	if err != nil {
+		return nil, fmt.Errorf("deleteSubject: %v", err)
+	}
+
+	return id, nil
+}
