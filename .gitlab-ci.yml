@@ -13,8 +13,9 @@ stages:
   services:
     - docker:dind
   before_script:
-    - docker context create build --docker "host=tcp://docker:2376"
-    - docker context use build
+    - docker context create builder --docker "host=tcp://docker:2376"
+    - docker context use builder
+    - docker buildx create builder --use
     - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN $CI_REGISTRY
   script:
     - |
