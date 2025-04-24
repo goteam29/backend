@@ -62,7 +62,7 @@ stages:
 
 
   build-text-service:
-    extends: .build-template
+    extends: .build_template
     stage: build
     rules:
       - when: always
@@ -71,7 +71,7 @@ stages:
       SERVICE_NAME: "text-service"
 
     build-video-service:
-      extends: .build-template
+      extends: .build_template
       stages: build
       rules:
         - when: always
@@ -80,7 +80,7 @@ stages:
         SERVICE_NAME: "video-service"
 
     build-file-service:
-      extends: .build-template
+      extends: .build_template
       stage: build
       rules:
         - when: always
