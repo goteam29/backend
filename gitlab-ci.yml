@@ -23,36 +23,48 @@ services:
 
 build-main-api-gateway:
   extends: .build_template
+  tags:
+    - docker
   variables:
     SERVICE_DIR: "internal/gateways/main-api-gateway"
     SERVICE_NAME: "main-api-gateway"
 
 build-video-api-gateway:
   extends: .build_template
+  tags:
+    - docker
   variables:
     SERVICE_DIR: "internal/gateways/video-api-gateway"
     SERVICE_NAME: "video-api-gateway"
 
 build-user-service:
   extends: .build_template
+  tags:
+    - docker
   variables:
     SERVICE_DIR: "internal/services/user-service"
     SERVICE_NAME: "user-service"
 
 build-text-service:
   extends: .build_template
+  tags:
+    - docker
   variables:
     SERVICE_DIR: "internal/services/text-service"
     SERVICE_NAME: "text-service"
 
 build-video-service:
   extends: .build_template
+  tags:
+    - docker
   variables:
     SERVICE_DIR: "internal/services/video-service"
     SERVICE_NAME: "video-service"
 
 build-file-service:
   extends: .build_template
+  tags:
+    - docker
   variables:
     SERVICE_DIR: "internal/services/file-service"
     SERVICE_NAME: "file-service"
