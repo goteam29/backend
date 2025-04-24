@@ -69,7 +69,7 @@ pre-build:
 
 build-docker-images:
   stage: build
-  needs: ["preparation"]
+  needs: ["pre-build"]
   parallel:
     matrix:
       - FILE: internal/services/video-service/Dockerfile
