@@ -1,4 +1,5 @@
 variables:
+  DOCKER_HOST: tcp://docker:2376
   DOCKER_TLS_CERTDIR: "/certs"
   DOCKER_BUILDKIT: 1
   REGISTRY: $CI_REGISTRY
