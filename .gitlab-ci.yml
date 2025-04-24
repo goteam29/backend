@@ -1,18 +1,57 @@
 variables:
+  DOCKER_HOST: tcp://docker:2376
   DOCKER_TLS_CERTDIR: "/certs"
   DOCKER_BUILDKIT: 1
   REGISTRY: $CI_REGISTRY
   IMAGE_BASE: $CI_REGISTRY_IMAGE
 
 stages:
+  - preparation
   - build
 
-.build-template: &build-template
-  stage: build
-  image: docker:24.0
-  services:
-    - docker:24.0-dind
+.preparation-template: &preparation-template
+  image: golang:1.24-alpine
+  stage: preparation
+  variables:
+    GOOS: linux
+    GOARCH: amd64
+    GOPATH: "/go"
   before_script:
+    - apk update
+    - apk add --no-cache make protobuf-dev git
+  script:
+    - go mod tidy
+    - go fmt ./...
+    - go mod download
+    - go get google.golang.org/grpc/cmd/protoc-gen-go-grpc
+    - go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway
+    - go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2
+    - go install google.golang.org/protobuf/cmd/protoc-gen-go
+    - go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
+    - export PATH="$PATH:$(go env GOPATH)/bin"
+    - make generate_api
+  artifacts:
+    paths:
+      - .
+    expire_in: 1 hour
+
+pre-build:
+  <<: *preparation-template
+  # Always run regardless of changes
+  rules:
+    - if: $CI_PIPELINE_SOURCE  # Remove file-based conditions
+
+.build-template: &build-template
+  image: docker
+  services:
+    - docker:dind
+  stage: build
+  needs: ["pre-build"]  # Requires the preparation job
+  before_script:
+    - docker context create builder --docker "host=tcp://docker:2376,ca=/certs/client/ca.pem,cert=/certs/client/cert.pem,key=/certs/client/key.pem"
+    - unset DOCKER_HOST
+    - docker context use builder
+    - docker buildx create builder --use
     - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN $CI_REGISTRY
   script:
     - |
@@ -47,7 +86,3 @@ build-docker-images:
   variables:
     IMAGE_NAME: "${IMAGE_BASE}/${SUFFIX}"
   <<: *build-template
-
-# Optional: Add rules to ignore specific paths
-# Note: GitLab doesn't support exclude patterns in rules:changes directly
-# You might need to implement custom logic if path filtering is critical

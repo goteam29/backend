@@ -27,9 +27,6 @@ generate_api:
 	  --grpc-gateway_out=. \
 	  pkg/proto/user-service/user.proto
 
-
-
-
 build:
 	go mod download
 	go build -o service ./cmd/main.go
