@@ -3,13 +3,13 @@ stages:
 
 variables:
   DOCKER_DRIVER: overlay2
+  DOCKER_HOST: "unix:///var/run/docker.sock"  # Подключение к хостовому Docker
 
 .build_template:
   stage: build
-  image: docker:24.0.7
-  before_script:
-    - docker info
+  image: docker:24.0.7  # Используем только Docker CLI
   script:
+    - docker info  # Проверим, что Docker доступен
     - docker build -t "$SERVICE_NAME" "$SERVICE_DIR"
     - mkdir -p build
     - docker save "$SERVICE_NAME" -o "build/${SERVICE_NAME}.tar"
