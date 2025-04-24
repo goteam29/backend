@@ -2,13 +2,17 @@ stages:
   - build
 
 variables:
-  DOCKER_HOST: "unix:///var/run/docker.sock"  # Подключение к хостовому Docker
+  DOCKER_HOST: "tcp://docker:2375"
+  DOCKER_DRIVER: overlay2
+
+services:
+  - docker:24.0.7-dind  # Docker daemon в контейнере
 
 .build_template:
   stage: build
-  image: docker:24.0.7  # Используем только Docker CLI
+  image: docker:24.0.7  # CLI для управления докером
   script:
-    - docker info  # Проверим, что Docker доступен
+    - docker info  # Проверка доступа к Docker Daemon
     - docker build -t "$SERVICE_NAME" "$SERVICE_DIR"
     - mkdir -p build
     - docker save "$SERVICE_NAME" -o "build/${SERVICE_NAME}.tar"
