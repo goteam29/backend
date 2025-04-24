@@ -139,30 +139,30 @@ func SelectSubjects(ctx context.Context, db *sql.DB) (*textService.GetSubjectsRe
 	}, nil
 }
 
-func UpdateSubject(ctx context.Context, db *sql.DB, req *textService.AssignSectionToSubjectRequest) (*textService.AssignSectionToSubjectResponse, error) {
-	query := `
-		UPDATE sections
-		SET subject_id = $1
-		WHERE id = $2;
-	`
-
-	_, err := db.Exec(query, req.Id, req.SectionId)
-	if err != nil {
-		return nil, fmt.Errorf("pgUpdateSubject: failed to add section in subject: %v", err)
-	}
-
-	return &textService.AssignSectionToSubjectResponse{
-		SectionId: req.SectionId,
-	}, nil
-}
-
-func DeleteSubject(ctx context.Context, db *sql.DB, req *textService.DeleteSubjectRequest) (*textService.DeleteSubjectResponse, error) {
-	_, err := db.Exec("DELETE FROM subjects WHERE id = $1", req.Id)
-	if err != nil {
-		return nil, fmt.Errorf("pgDeleteSubject: failed to delete subject from database: %v", err)
-	}
-
-	return &textService.DeleteSubjectResponse{
-		Id: req.Id,
-	}, nil
-}
+//func UpdateSubject(ctx context.Context, db *sql.DB, req *textService.AssignSectionToSubjectRequest) (*textService.AssignSectionToSubjectResponse, error) {
+//	query := `
+//		UPDATE sections
+//		SET subject_id = $1
+//		WHERE id = $2;
+//	`
+//
+//	_, err := db.Exec(query, req.Id, req.SectionId)
+//	if err != nil {
+//		return nil, fmt.Errorf("pgUpdateSubject: failed to add section in subject: %v", err)
+//	}
+//
+//	return &textService.AssignSectionToSubjectResponse{
+//		SectionId: req.SectionId,
+//	}, nil
+//}
+//
+//func DeleteSubject(ctx context.Context, db *sql.DB, req *textService.DeleteSubjectRequest) (*textService.DeleteSubjectResponse, error) {
+//	_, err := db.Exec("DELETE FROM subjects WHERE id = $1", req.Id)
+//	if err != nil {
+//		return nil, fmt.Errorf("pgDeleteSubject: failed to delete subject from database: %v", err)
+//	}
+//
+//	return &textService.DeleteSubjectResponse{
+//		Id: req.Id,
+//	}, nil
+//}

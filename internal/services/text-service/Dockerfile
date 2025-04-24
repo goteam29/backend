@@ -18,9 +18,7 @@ WORKDIR /app
 
 COPY --from=builder /text-service .
 COPY config/ ./config/
-COPY db/ ./db/
 
-
-EXPOSE 50052
+EXPOSE 50053
 
 CMD ["./text-service"]

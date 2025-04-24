@@ -18,8 +18,7 @@ WORKDIR /app
 
 COPY --from=builder /video-service .
 COPY config/ ./config/
-COPY .env ./
 
-EXPOSE 50054
+EXPOSE 50053
 
 CMD ["./video-service"]

@@ -18,9 +18,7 @@ WORKDIR /app
 
 COPY --from=builder /user-service .
 COPY config/ ./config/
-COPY db/ ./db/
 
-
-EXPOSE 50051
+EXPOSE 50053
 
 CMD ["./user-service"]

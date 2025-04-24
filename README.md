@@ -25,7 +25,7 @@ Easily integrable into existing systems
    - [🧩 What Each Service Does](#-what-each-service-does)
    - [⚙️ Tech-Stack](#️-tech-stack)
    - [👍Our advantages](#our-advantages)
-- [🚀 Main API Gateway](#rocketmain-api-gateway)
+- [🚀 Main API Gateway](#main-api-gateway)
    - [📁 File Service API](#-file-service-api)
       - [`GetFile`](#-getfile)
       - [`SetFile`](#-setfile)
