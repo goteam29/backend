@@ -1,5 +1,4 @@
 variables:
-  DOCKER_HOST: "unix:///var/run/docker.sock"
   DOCKER_BUILDKIT: 1
   REGISTRY: $CI_REGISTRY
   IMAGE_BASE: $CI_REGISTRY_IMAGE
