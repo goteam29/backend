@@ -3,6 +3,9 @@ variables:
   REGISTRY: $CI_REGISTRY
   IMAGE_BASE: $CI_REGISTRY_IMAGE
 
+services:
+  - docker:24.0.7-dind
+
 stages:
   - preparation
   - build
@@ -40,16 +43,11 @@ pre-build:
 
 .build-template: &build-template
   image: docker:24.0.7
-  services:
-    - name: docker:24.0.7-dind
-      alias: docker
-      command: ["--host=tcp://0.0.0.0:2375", "--insecure-registry=$CI_REGISTRY"]
-      variables:
-        DOCKER_TLS_CERTDIR: ""  # Отключаем TLS
   stage: build
   needs: ["pre-build"]
   variables:
-    DOCKER_HOST: tcp://docker:2375
+    DOCKER_HOST: "tcp://docker:2375"
+    DOCKER_TLS_CERTDIR: ""
   before_script:
     - docker info
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_JOB_TOKEN" "$CI_REGISTRY"
