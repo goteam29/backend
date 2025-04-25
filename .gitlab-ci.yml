@@ -3,9 +3,6 @@ variables:
   REGISTRY: $CI_REGISTRY
   IMAGE_BASE: $CI_REGISTRY_IMAGE
 
-services:
-  - docker:24.0.7-dind
-
 stages:
   - preparation
   - build
@@ -46,8 +43,7 @@ pre-build:
   stage: build
   needs: ["pre-build"]
   variables:
-    DOCKER_HOST: "tcp://docker:2375"
-    DOCKER_TLS_CERTDIR: ""
+    DOCKER_HOST: "unix:///var/run/docker.sock"
   before_script:
     - docker info
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_JOB_TOKEN" "$CI_REGISTRY"
