@@ -1,6 +1,4 @@
 variables:
-  DOCKER_HOST: tcp://docker:2376
-  DOCKER_TLS_CERTDIR: "/certs"
   DOCKER_BUILDKIT: 1
   REGISTRY: $CI_REGISTRY
   IMAGE_BASE: $CI_REGISTRY_IMAGE
@@ -11,7 +9,7 @@ stages:
 
 .preparation-template: &preparation-template
   image: golang:1.24-alpine
-  stage: preparation
+  stage: pre-build
   variables:
     GOOS: linux
     GOARCH: amd64
@@ -37,31 +35,33 @@ stages:
 
 pre-build:
   <<: *preparation-template
-  # Always run regardless of changes
   rules:
-    - if: $CI_PIPELINE_SOURCE  # Remove file-based conditions
+    - if: $CI_PIPELINE_SOURCE
 
 .build-template: &build-template
-  image: docker
+  image: docker:24.0.7
   services:
-    - docker:dind
+    - name: docker:24.0.7-dind
+      alias: docker
+      command: ["--host=tcp://0.0.0.0:2375", "--insecure-registry=$CI_REGISTRY"]
+      variables:
+        DOCKER_TLS_CERTDIR: ""  # Отключаем TLS
   stage: build
-  needs: ["pre-build"]  # Requires the preparation job
+  needs: ["pre-build"]
+  variables:
+    DOCKER_HOST: tcp://docker:2375
   before_script:
-    - docker context create builder --docker "host=tcp://docker:2376,ca=/certs/client/ca.pem,cert=/certs/client/cert.pem,key=/certs/client/key.pem"
-    - unset DOCKER_HOST
-    - docker context use builder
-    - docker buildx create builder --use
-    - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN $CI_REGISTRY
+    - docker info
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_JOB_TOKEN" "$CI_REGISTRY"
   script:
+    - docker buildx create --use
     - |
-      docker buildx create --use
       TAGS="--tag $IMAGE_NAME:${CI_COMMIT_REF_SLUG} --tag $IMAGE_NAME:${CI_COMMIT_SHORT_SHA}"
       if [ "$CI_COMMIT_BRANCH" = "$CI_DEFAULT_BRANCH" ]; then
         TAGS="$TAGS --tag $IMAGE_NAME:latest"
       fi
       docker buildx build \
-        --file $FILE \
+        --file "$FILE" \
         $TAGS \
         --push \
         --cache-from type=registry,ref=$IMAGE_NAME:buildcache \
