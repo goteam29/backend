@@ -9,7 +9,7 @@ stages:
 
 .preparation-template: &preparation-template
   image: golang:1.24-alpine
-  stage: pre-build
+  stage: preparation
   variables:
     GOOS: linux
     GOARCH: amd64
