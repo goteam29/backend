@@ -9,16 +9,22 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/lib/pq"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
+var ErrClassAlreadyExists = errors.New("class already exists")	
 var ErrClassNotFound = errors.New("class not found")
-var ErrSubjectNotFound = errors.New("subject not found")
+var ErrClassOrSubjectNotFound = errors.New("class or subject not found")
 
 func InsertClass(ctx context.Context, db *sql.DB, req *textService.CreateClassRequest) (*textService.CreateClassResponse, error) {
 	id := uuid.New()
 
 	_, err := db.ExecContext(ctx, "INSERT INTO classes (id, number) VALUES ($1, $2)", id, req.Number)
 	if err != nil {
+		var pqErr *pq.Error
+		if errors.As(err, &pqErr) && pqErr.Code == "23505" {
+			return nil, ErrClassAlreadyExists
+		}
 		return nil, fmt.Errorf("pgInsertClass: failed to insert class in classes: %w", err)
 	}
 
@@ -40,9 +46,7 @@ func SelectClass(ctx context.Context, db *sql.DB, req *textService.GetClassReque
 		WHERE
 			c.id = $1
 		GROUP BY
-			c.id, c.number
-		ORDER BY
-			c.number;
+			c.id, c.number;
 	`
 
 	classRow := db.QueryRowContext(ctx, query, req.Id)
@@ -55,7 +59,10 @@ func SelectClass(ctx context.Context, db *sql.DB, req *textService.GetClassReque
 
 	err := classRow.Scan(&id, &number, &subjectIDs)
 	if err != nil {
-		return nil, fmt.Errorf("pgSelectClasses: failed to scan row: %w", err)
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrClassNotFound
+		}
+		return nil, fmt.Errorf("pgSelectClass: failed to scan row: %w", err)
 	}
 
 	class := &textService.Class{
@@ -146,7 +153,7 @@ func AddSubjectInClass(ctx context.Context, db *sql.DB, req *textService.AddSubj
 		return nil, fmt.Errorf("pgAddSubjectInClass: failed to get rows affected: %w", err)
 	}
 	if rowsAddected == 0 {
-		return nil, ErrSubjectNotFound
+		return nil, ErrClassOrSubjectNotFound
 	}
 
 	return &textService.AddSubjectInClassResponse{
@@ -162,9 +169,17 @@ func RemoveSubjectFromClass(ctx context.Context, db *sql.DB, req *textService.Re
 		AND subject_id = $2;
 	`
 
-	_, err := db.ExecContext(ctx, query, req.Id, req.SubjectId)
+	result, err := db.ExecContext(ctx, query, req.Id, req.SubjectId)
 	if err != nil {
 		return nil, fmt.Errorf("pgUpdateClass: failed to remove subject from classes_subjects: %w", err)
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return nil, fmt.Errorf("pgRemoveSubjectFromClass: failed to get rows affected: %w", err)
+	}
+	if rowsAffected == 0 {
+		return nil, ErrSubjectNotFound
 	}
 
 	return &textService.RemoveSubjectFromClassResponse{
@@ -172,18 +187,25 @@ func RemoveSubjectFromClass(ctx context.Context, db *sql.DB, req *textService.Re
 	}, nil
 }
 
-func DeleteClass(ctx context.Context, db *sql.DB, req *textService.DeleteClassRequest) (*textService.DeleteClassResponse, error) {
+func DeleteClass(ctx context.Context, db *sql.DB, req *textService.DeleteClassRequest) (*emptypb.Empty, error) {
 	query := `
 		DELETE 
 		FROM classes 
 		WHERE id = $1;
 	`
-	_, err := db.ExecContext(ctx, query, req.Id)
+	result, err := db.ExecContext(ctx, query, req.Id)
 	if err != nil {
 		return nil, fmt.Errorf("pgDeleteClass: failed to delete class in database: %w", err)
 	}
 
-	return &textService.DeleteClassResponse{
-		Id: req.Id,
-	}, nil
+	rowsAffected,err:= result.RowsAffected()
+	if err != nil {
+		return nil, fmt.Errorf("pgDeleteClass: failed to get rows affected: %w", err)	
+	}
+
+	if rowsAffected == 0 {
+		return nil, ErrClassNotFound
+	}
+
+	return &emptypb.Empty{}, nil
 }

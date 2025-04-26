@@ -5,20 +5,21 @@ package text_service;
 option go_package = "pkg/api/text-service";
 
 import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
 
 service Text{
   // Class
 
   rpc CreateClass(CreateClassRequest) returns (CreateClassResponse){
     option(google.api.http) = {
-        post: "/api/v0/class"
-        body: "*"
+      post: "/api/v0/classes"
+      body: "*"
     };
   }
 
   rpc GetClass(GetClassRequest) returns (GetClassResponse){
     option (google.api.http) = {
-      get: "/api/v0/class"
+      get: "/api/v0/classes/{id}"
     };
   };
   rpc GetClasses(GetClassesRequest) returns (GetClassesResponse){
@@ -29,19 +30,19 @@ service Text{
 
   rpc AddSubjectInClass(AddSubjectInClassRequest) returns (AddSubjectInClassResponse){
     option (google.api.http) = {
-      post: "/api/v0/class-subject"
-      body: "*"
+      post: "/api/v0/classes/{id}/subjects"
+      body: "subject_id"
     };
   };
   rpc RemoveSubjectFromClass(RemoveSubjectFromClassRequest) returns (RemoveSubjectFromClassResponse){
     option (google.api.http) = {
-      delete: "/api/v0/class-subject"
+      delete: "/api/v0/classes/{id}/subjects/{subject_id}"
     };
   };
 
-  rpc DeleteClass(DeleteClassRequest) returns (DeleteClassResponse){
+  rpc DeleteClass(DeleteClassRequest) returns (google.protobuf.Empty){
     option (google.api.http) = {
-        delete: "/api/v0/class"
+      delete: "/api/v0/classes/{id}"
     };
   };
 
@@ -49,14 +50,14 @@ service Text{
 
   rpc CreateSubject(CreateSubjectRequest) returns (CreateSubjectResponse){
     option (google.api.http) = {
-      post: "/api/v0/subject"
+      post: "/api/v0/subjects"
       body: "*"
     };
   };
 
   rpc GetSubject(GetSubjectRequest) returns (GetSubjectResponse){
     option (google.api.http) = {
-      get: "/api/v0/subject"
+      get: "/api/v0/subjects/{id}"
     };
   };
   rpc GetSubjects(GetSubjectsRequest) returns (GetSubjectsResponse){
@@ -67,14 +68,14 @@ service Text{
 
   rpc AssignSectionToSubject(AssignSectionToSubjectRequest) returns (AssignSectionToSubjectResponse){
     option (google.api.http) = {
-      post: "/api/v0/section-subject"
-      body: "*"
+      post: "/api/v0/subjects/{id}/sections"
+      body: "section_id"
     };
   };
 
-  rpc DeleteSubject(DeleteSubjectRequest) returns (DeleteSubjectResponse){
+  rpc DeleteSubject(DeleteSubjectRequest) returns (google.protobuf.Empty){
     option (google.api.http) = {
-      delete: "/api/v0/subject"
+      delete: "/api/v0/subjects/{id}"
     };
   };
 
@@ -82,14 +83,14 @@ service Text{
 
   rpc CreateSection(CreateSectionRequest) returns (CreateSectionResponse){
     option (google.api.http) = {
-      post: "/api/v0/section"
+      post: "/api/v0/sections"
       body: "*"
     };
   };
 
   rpc GetSection(GetSectionRequest) returns (GetSectionResponse){
     option (google.api.http) = {
-      get: "/api/v0/section"
+      get: "/api/v0/sections/{id}"
     };
   };
   rpc GetSections(GetSectionsRequest) returns (GetSectionsResponse){
@@ -100,14 +101,14 @@ service Text{
 
   rpc AssignLessonToSection(AssignLessonToSectionRequest) returns (AssignLessonToSectionResponse){
     option (google.api.http) = {
-      post: "/api/v0/section-lesson"
-      body: "*"
+      post: "/api/v0/sections/{id}/lessons"
+      body: "lesson_id"
     };
   };
 
-  rpc DeleteSection(DeleteSectionRequest) returns (DeleteSectionResponse){
+  rpc DeleteSection(DeleteSectionRequest) returns (google.protobuf.Empty){
     option (google.api.http) = {
-      delete: "/api/v0/section"
+      delete: "/api/v0/sections/{id}"
     };
   };
 
@@ -115,14 +116,14 @@ service Text{
 
   rpc CreateLesson(CreateLessonRequest) returns (CreateLessonResponse){
     option (google.api.http) = {
-      post: "/api/v0/lesson"
+      post: "/api/v0/lessons"
       body: "*"
     };
   };
 
   rpc GetLesson(GetLessonRequest) returns (GetLessonResponse){
     option (google.api.http) = {
-      get: "/api/v0/lesson"
+      get: "/api/v0/lessons/{id}"
     };
   };
   rpc GetLessons(GetLessonsRequest) returns (GetLessonsResponse){
@@ -133,19 +134,18 @@ service Text{
 
   rpc IncreaseRating(IncreaseRatingRequest) returns (IncreaseRatingResponse){
     option (google.api.http) = {
-      post: "/api/v0/lesson-rating"
-      body: "*"
+      post: "/api/v0/lessons/{id}:increaseRating"
     };
   };
   rpc DecreaseRating(DecreaseRatingRequest) returns (DecreaseRatingResponse){
     option (google.api.http) = {
-      delete: "/api/v0/lesson-rating"
+      post: "/api/v0/lessons/{id}:decreaseRating"
     };
   };
 
-  rpc DeleteLesson(DeleteLessonRequest) returns (DeleteLessonResponse){
+  rpc DeleteLesson(DeleteLessonRequest) returns (google.protobuf.Empty){
     option (google.api.http) = {
-      delete: "/api/v0/lesson"
+      delete: "/api/v0/lessons/{id}"
     };
   };
 }
@@ -201,9 +201,6 @@ message RemoveSubjectFromClassResponse{
 message DeleteClassRequest{
   string id = 1;
 }
-message DeleteClassResponse{
-  string id = 1;
-}
 
 // --------------------------------------------------------------------------------------------------------
 // Subject
@@ -248,9 +245,6 @@ message AssignSectionToSubjectResponse{
 
 // Delete
 message DeleteSubjectRequest{
-  string id = 1;
-}
-message DeleteSubjectResponse{
   string id = 1;
 }
 
@@ -301,10 +295,6 @@ message DeleteSectionRequest{
   string id = 1;
 }
 
-message DeleteSectionResponse{
-  string id = 1;
-}
-
 // --------------------------------------------------------------------------------------------------------
 // Lesson
 
@@ -345,19 +335,16 @@ message IncreaseRatingRequest{
   string id = 1;
 }
 message IncreaseRatingResponse{
-  string id = 1;
+  int32 rating = 1;
 }
 
 message DecreaseRatingRequest{
   string id = 1;
 }
 message DecreaseRatingResponse{
-  string id = 1;
+  int32 rating = 1;
 }
 
 message DeleteLessonRequest{
-    string id = 1;
-}
-message DeleteLessonResponse{
     string id = 1;
 }

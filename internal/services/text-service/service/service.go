@@ -7,6 +7,7 @@ import (
 	"database/sql"
 
 	"github.com/redis/go-redis/v9"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type TextService struct {
@@ -44,7 +45,7 @@ func (ts *TextService) RemoveSubjectFromClass(ctx context.Context, request *text
 	return ts.textHandler.RemoveSubjectFromClass(ctx, request)
 }
 
-func (ts *TextService) DeleteClass(ctx context.Context, request *textService.DeleteClassRequest) (*textService.DeleteClassResponse, error) {
+func (ts *TextService) DeleteClass(ctx context.Context, request *textService.DeleteClassRequest) (*emptypb.Empty, error) {
 	return ts.textHandler.DeleteClass(ctx, request)
 }
 
@@ -68,7 +69,7 @@ func (ts *TextService) AssignSectionToSubject(ctx context.Context, request *text
 	return ts.textHandler.AssignSectionToSubject(ctx, request)
 }
 
-func (ts *TextService) DeleteSubject(ctx context.Context, request *textService.DeleteSubjectRequest) (*textService.DeleteSubjectResponse, error) {
+func (ts *TextService) DeleteSubject(ctx context.Context, request *textService.DeleteSubjectRequest) (*emptypb.Empty, error) {
 	return ts.textHandler.DeleteSubject(ctx, request)
 }
 
@@ -91,7 +92,7 @@ func (ts *TextService) AssignLessonToSection(ctx context.Context, request *textS
 	return ts.textHandler.AssignLessonToSection(ctx, request)
 }
 
-func (ts *TextService) DeleteSection(ctx context.Context, request *textService.DeleteSectionRequest) (*textService.DeleteSectionResponse, error) {
+func (ts *TextService) DeleteSection(ctx context.Context, request *textService.DeleteSectionRequest) (*emptypb.Empty, error) {
 	return ts.textHandler.DeleteSection(ctx, request)
 }
 
@@ -118,7 +119,7 @@ func (ts *TextService) DecreaseRating(ctx context.Context, request *textService.
 	return ts.textHandler.DecreaseRating(ctx, request)
 }
 
-func (ts *TextService) DeleteLesson(ctx context.Context, request *textService.DeleteLessonRequest) (*textService.DeleteLessonResponse, error) {
+func (ts *TextService) DeleteLesson(ctx context.Context, request *textService.DeleteLessonRequest) (*emptypb.Empty, error) {
 	return ts.textHandler.DeleteLesson(ctx, request)
 }
 
