@@ -100,7 +100,6 @@ service Text{
   };
 
   rpc AssignLessonToSection(AssignLessonToSectionRequest) returns (AssignLessonToSectionResponse){
-  rpc AssignLessonToSection(AssignLessonToSectionRequest) returns (AssignLessonToSectionResponse){
     option (google.api.http) = {
       post: "/api/v0/sections/{id}/lessons"
       body: "lesson_id"
