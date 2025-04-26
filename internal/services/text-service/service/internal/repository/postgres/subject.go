@@ -4,11 +4,15 @@ import (
 	textService "api-repository/pkg/api/text-service"
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/google/uuid"
 	"github.com/lib/pq"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
+
+var ErrSubjectNotFound = errors.New("subject not found")
 
 func InsertSubject(ctx context.Context, db *sql.DB, req *textService.CreateSubjectRequest) (*textService.CreateSubjectResponse, error) {
 	id := uuid.New()
@@ -156,13 +160,11 @@ func UpdateSubject(ctx context.Context, db *sql.DB, req *textService.AssignSecti
 	}, nil
 }
 
-func DeleteSubject(ctx context.Context, db *sql.DB, req *textService.DeleteSubjectRequest) (*textService.DeleteSubjectResponse, error) {
+func DeleteSubject(ctx context.Context, db *sql.DB, req *textService.DeleteSubjectRequest) (*emptypb.Empty, error) {
 	_, err := db.Exec("DELETE FROM subjects WHERE id = $1", req.Id)
 	if err != nil {
 		return nil, fmt.Errorf("pgDeleteSubject: failed to delete subject from database: %v", err)
 	}
 
-	return &textService.DeleteSubjectResponse{
-		Id: req.Id,
-	}, nil
+	return &emptypb.Empty{}, nil
 }

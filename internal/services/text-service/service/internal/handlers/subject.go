@@ -5,6 +5,8 @@ import (
 	textService "api-repository/pkg/api/text-service"
 	"context"
 	"fmt"
+
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 func (th *TextHandler) CreateSubject(ctx context.Context, req *textService.CreateSubjectRequest) (*textService.CreateSubjectResponse, error) {
@@ -43,7 +45,7 @@ func (th *TextHandler) AssignSectionToSubject(ctx context.Context, req *textServ
 	return sectionId, nil
 }
 
-func (th *TextHandler) DeleteSubject(ctx context.Context, req *textService.DeleteSubjectRequest) (*textService.DeleteSubjectResponse, error) {
+func (th *TextHandler) DeleteSubject(ctx context.Context, req *textService.DeleteSubjectRequest) (*emptypb.Empty, error) {
 	id, err := postgresRepo.DeleteSubject(ctx, th.pg, req)
 	if err != nil {
 		return nil, fmt.Errorf("deleteSubject: %v", err)

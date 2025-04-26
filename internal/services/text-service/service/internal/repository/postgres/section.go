@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/lib/pq"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 func InsertSection(db *sql.DB, req *textService.CreateSectionRequest) (*textService.CreateSectionResponse, error) {
@@ -126,12 +127,12 @@ func SelectSections(db *sql.DB) (*textService.GetSectionsResponse, error) {
 }
 
 func UpdateSection(db *sql.DB, req *textService.AssignLessonToSectionRequest) (*textService.AssignLessonToSectionResponse, error) {
-	query:= `
+	query := `
 		UPDATE lessons
 		SET section_id = $1
 		WHERE id = $2;
 	`
-	
+
 	_, err := db.Exec(query, req.Id, req.LessonId)
 	if err != nil {
 		return nil, fmt.Errorf("pgAddLessonsInSection: failed to add lesson in section: %v", err)
@@ -142,13 +143,11 @@ func UpdateSection(db *sql.DB, req *textService.AssignLessonToSectionRequest) (*
 	}, nil
 }
 
-func DeleteSection(db *sql.DB, req *textService.DeleteSectionRequest) (*textService.DeleteSectionResponse, error) {
+func DeleteSection(db *sql.DB, req *textService.DeleteSectionRequest) (*emptypb.Empty, error) {
 	_, err := db.Exec("DELETE FROM sections WHERE id = $1", req.Id)
 	if err != nil {
 		return nil, fmt.Errorf("pgDeleteSection: failed to delete section: %v", err)
 	}
 
-	return &textService.DeleteSectionResponse{
-		Id: req.Id,
-	}, nil
+	return &emptypb.Empty{}, nil
 }

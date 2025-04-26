@@ -5,6 +5,8 @@ import (
 	textService "api-repository/pkg/api/text-service"
 	"context"
 	"fmt"
+
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 func (th *TextHandler) CreateLesson(ctx context.Context, req *textService.CreateLessonRequest) (*textService.CreateLessonResponse, error) {
@@ -52,7 +54,7 @@ func (th *TextHandler) DecreaseRating(ctx context.Context, req *textService.Decr
 	return id, nil
 }
 
-func (th *TextHandler) DeleteLesson(ctx context.Context, req *textService.DeleteLessonRequest) (*textService.DeleteLessonResponse, error) {
+func (th *TextHandler) DeleteLesson(ctx context.Context, req *textService.DeleteLessonRequest) (*emptypb.Empty, error) {
 	id, err := postgresRepo.DeleteLesson(th.pg, req)
 	if err != nil {
 		return nil, fmt.Errorf("deleteLesson: %v", err)

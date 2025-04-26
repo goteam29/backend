@@ -5,6 +5,8 @@ import (
 	textService "api-repository/pkg/api/text-service"
 	"context"
 	"fmt"
+
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 func (th *TextHandler) CreateSection(ctx context.Context, req *textService.CreateSectionRequest) (*textService.CreateSectionResponse, error) {
@@ -43,7 +45,7 @@ func (th *TextHandler) AssignLessonToSection(ctx context.Context, req *textServi
 	return lessonId, nil
 }
 
-func (th *TextHandler) DeleteSection(ctx context.Context, req *textService.DeleteSectionRequest) (*textService.DeleteSectionResponse, error) {
+func (th *TextHandler) DeleteSection(ctx context.Context, req *textService.DeleteSectionRequest) (*emptypb.Empty, error) {
 	id, err := postgresRepo.DeleteSection(th.pg, req)
 	if err != nil {
 		return nil, fmt.Errorf("deleteSection: %v", err)

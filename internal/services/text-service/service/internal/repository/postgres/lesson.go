@@ -7,7 +7,10 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/lib/pq"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
+
+var ErrLessonNotFound = fmt.Errorf("lesson not found")
 
 func InsertLesson(pg *sql.DB, req *textService.CreateLessonRequest) (*textService.CreateLessonResponse, error) {
 	id := uuid.New()
@@ -66,6 +69,9 @@ func SelectLesson(pg *sql.DB, req *textService.GetLessonRequest) (*textService.G
 	err := lessonRow.Scan(&id, &sectionId, &name, &description,
 		&videoIds, &fileIds, &exerciseIds, &commentIds, &rating)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, ErrLessonNotFound
+		}
 		return nil, fmt.Errorf("pgSelectLesson: failed to scan lesson: %v", err)
 	}
 
@@ -158,34 +164,60 @@ func SelectLessons(pg *sql.DB) (*textService.GetLessonsResponse, error) {
 }
 
 func IncreaseRating(pg *sql.DB, req *textService.IncreaseRatingRequest) (*textService.IncreaseRatingResponse, error) {
-	_, err := pg.Exec("UPDATE lessons SET rating = rating + 1 WHERE id = $1", req.Id)
+	var newRating int32
+
+	query := `
+		UPDATE lessons 
+		SET rating = rating + 1 
+		WHERE id = $1 
+		RETURNING rating
+	`
+
+	lessonRow := pg.QueryRow(query, req.Id)
+
+	err := lessonRow.Scan(&newRating)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, ErrLessonNotFound
+		}
 		return nil, fmt.Errorf("pgIncreaseRating: failed to increase lesson rating: %v", err)
 	}
 
 	return &textService.IncreaseRatingResponse{
-		Id: req.Id,
+		Rating: newRating,
 	}, nil
 }
 
 func DecreaseRating(pg *sql.DB, req *textService.DecreaseRatingRequest) (*textService.DecreaseRatingResponse, error) {
-	_, err := pg.Exec("UPDATE lessons SET rating = rating - 1 WHERE id = $1", req.Id)
+	var newRating int32
+
+	query := `
+		UPDATE lessons 
+		SET rating = rating - 1 
+		WHERE id = $1 
+		RETURNING rating
+	`
+
+	lessonRow := pg.QueryRow(query, req.Id)
+
+	err := lessonRow.Scan(&newRating)
 	if err != nil {
-		return nil, fmt.Errorf("pgDecreaseRating: failed to decrease lesson rating: %v", err)
+		if err == sql.ErrNoRows {
+			return nil, ErrLessonNotFound
+		}
+		return nil, fmt.Errorf("pgIncreaseRating: failed to increase lesson rating: %v", err)
 	}
 
 	return &textService.DecreaseRatingResponse{
-		Id: req.Id,
+		Rating: newRating,
 	}, nil
 }
 
-func DeleteLesson(pg *sql.DB, req *textService.DeleteLessonRequest) (*textService.DeleteLessonResponse, error) {
+func DeleteLesson(pg *sql.DB, req *textService.DeleteLessonRequest) (*emptypb.Empty, error) {
 	_, err := pg.Exec("DELETE FROM lessons WHERE id = $1", req.Id)
 	if err != nil {
 		return nil, fmt.Errorf("pgDeleteLesson: failed to delete lesson from database: %v", err)
 	}
 
-	return &textService.DeleteLessonResponse{
-		Id: req.Id,
-	}, nil
+	return &emptypb.Empty{}, nil
 }
